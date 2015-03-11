@@ -1,0 +1,7 @@
+CMakeLists.txt.user
+delivery
+.directory
+
+.idea
+*.pyc
+
