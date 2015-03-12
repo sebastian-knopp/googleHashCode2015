@@ -20,7 +20,7 @@ std::istream& operator>>(std::istream& is, Request& a_request)
 
     is >> a_request.m_nmbRows;
     std::cout << "rows: " << a_request.m_nmbRows << std::endl;
-    is >> a_request.m_nmbColumns;
+    is >> a_request.m_nmbSlots;
     is >> nmbUnavailable;
     is >> a_request.m_nmbPools;
     is >> nmbServers;

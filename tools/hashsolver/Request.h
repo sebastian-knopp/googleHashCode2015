@@ -14,8 +14,8 @@ public:
 
 public:
 
-    int32_t m_nmbRows = 0;
-    int32_t m_nmbColumns = 0;
+    size_t m_nmbRows = 0;
+    size_t m_nmbSlots = 0;
 
     Coordinates m_unavailableSlots;
 

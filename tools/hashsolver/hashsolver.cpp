@@ -4,6 +4,7 @@
 #include <algorithm>
 #include "Request.h"
 #include "Solution.h"
+#include "base/Vector2d.h"
 
 
 int main (int , char *[])
@@ -42,19 +43,68 @@ int main (int , char *[])
     }
 
     std::sort(begin(serverPermutation), end(serverPermutation), [&r] (size_t lhs, size_t rhs){
-       return r.m_servers[lhs].getRatio() < r.m_servers[rhs].getRatio();
+       return r.m_servers[lhs].getRatio() > r.m_servers[rhs].getRatio();
     });
-
+/*
     for (size_t serverIndex : serverPermutation)
     {
         std::cout << r.m_servers[serverIndex] << " r=" << r.m_servers[serverIndex].getRatio() << std::endl;
     }
+*/
+
+    base::Vector2d<size_t> isAssigned(r.m_nmbRows, r.m_nmbSlots, 0);
+    for (const Coordinate& c : r.m_unavailableSlots)
+    {
+        isAssigned(c.m_row, c.m_slot) = 1;
+    }
+
+    auto isAvailable = [&] (size_t row, size_t slot, size_t size)
+    {
+        for (size_t i = 0; i < size; ++i)
+        {
+            if (isAssigned(row, slot))
+                return false;
+        }
+        return true;
+    };
+
+    auto place = [&] (size_t row, size_t slot, size_t size)
+    {
+        for (size_t i = 0; i < size; ++i)
+        {
+            isAssigned(row, slot) = true;
+        }
+    };
 
     Solution s;
+    s.m_servers.resize(r.m_servers.size());
+
+    for (size_t serverIndex : serverPermutation)
+    {
+        const Server& server = r.m_servers[serverIndex];
+        size_t currentRow = 0;
+        while (currentRow < r.m_nmbRows)
+        {
+            size_t currentSlot = 0;
+            while (currentSlot < r.m_nmbSlots)
+            {
+                if (isAvailable(currentRow, currentSlot, server.m_size))
+                {
+                    place(currentRow, currentSlot, server.m_size);
+                    s.m_servers[serverIndex].m_coord.m_row = currentRow;
+                    s.m_servers[serverIndex].m_coord.m_slot = currentSlot;
+                    s.m_servers[serverIndex].m_poolIndex = 0;
+                    std::cout << "placed" << std::endl;
+                }
+                ++currentSlot;
+            }
+            ++currentRow;
+        }
+    }
+
+    //for ();
 
     std::ofstream ofs("out.txt");
-
-    s.m_servers.resize(r.m_servers.size());
     ofs << s;
 }
 
