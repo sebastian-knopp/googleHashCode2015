@@ -4,9 +4,12 @@
 
 std::ostream& operator<<(std::ostream& is, const Solution& a_solution)
 {
-    for (const PlacedServer& s : a_solution.m_servers)
+
+    for (size_t i = 0; i != a_solution.m_servers.size(); ++i)
     {
-        is << s;
+        is << a_solution.m_servers[i];
+        if (i + 1 != a_solution.m_servers.size())
+            is << "\n";
     }
     return is;
 }

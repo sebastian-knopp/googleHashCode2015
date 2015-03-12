@@ -12,7 +12,7 @@ int main (int , char *[])
     std::cout << "Team A211: Abdel Bitar and Sebastian Knopp" << std::endl;
 
 
-    Request r = readFile("example.txt");
+    Request r = readFile("dc.in");
 
     std::cout << "read file" << std::endl;
     std::cout << "c = " << r.m_nmbColumns << std::endl;
