@@ -183,11 +183,16 @@ int main (int , char *[])
     size_t bestRating = getRating();
     std::cout << "initial rating : " << bestRating << std::endl;
 
-    for (size_t i = 0; i != 1000; ++i)
+    for (size_t i = 0; i != 100000; ++i)
     {
         size_t randomIndex = placedServerIndices[intDistribution(rndGenerator) % placedServerIndices.size()];
 
-        s.m_servers[randomIndex].m_poolIndex = 0;
+        size_t oldPoolIndex = s.m_servers[randomIndex].m_poolIndex;
+        size_t newPoolIndex = intDistribution(rndGenerator) % r.m_nmbPools;
+        s.m_servers[randomIndex].m_poolIndex = newPoolIndex;
+
+        assignedCapacity(s.m_servers[randomIndex].m_coord.m_row, oldPoolIndex) -= r.m_servers[randomIndex].m_capacity;
+        assignedCapacity(s.m_servers[randomIndex].m_coord.m_row, newPoolIndex) += r.m_servers[randomIndex].m_capacity;
 
         size_t newRating = getRating();
         std::cout << "new rating : " << newRating << std::endl;
