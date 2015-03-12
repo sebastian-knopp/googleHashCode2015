@@ -1,5 +1,4 @@
 #include "Request.h"
-#include "LineParser.h"
 #include <sstream>
 #include <iostream>
 #include <fstream>
@@ -7,9 +6,8 @@
 
 std::istream& operator>>(std::istream& is, Request& a_request)
 {
-    LineParser parser(is);
 
-    std::stringstream s(parser.getLine());
+    //std::stringstream s(parser.getLine());
 
     // R​(1 ≤ R ≤ 1000) ​denotes the number of rows in the data center,
     // S​(1 ≤ S ≤ 1000) denotes the number of slots in each row of the data center,
@@ -21,6 +19,7 @@ std::istream& operator>>(std::istream& is, Request& a_request)
     size_t nmbServers = 0;
 
     is >> a_request.m_nmbRows;
+    std::cout << "rows: " << a_request.m_nmbRows << std::endl;
     is >> a_request.m_nmbColumns;
     is >> nmbUnavailable;
     is >> a_request.m_nmbPools;
