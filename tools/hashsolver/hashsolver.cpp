@@ -58,7 +58,7 @@ int main (int , char *[])
     auto getPoolCapacity = [&] (size_t a_pool)
     {
         size_t nmbRows = assignedCapacity.width();
-        size_t c;
+        size_t c = 0;
         for (size_t i = 0; i < nmbRows; ++i)
         {
             c += assignedCapacity(i, a_pool);
