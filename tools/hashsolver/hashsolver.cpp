@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <limits>
+#include <algorithm>
 #include "Request.h"
 #include "Solution.h"
 
@@ -13,7 +14,7 @@ int main (int , char *[])
 
 
     Request r = readFile("dc.in");
-
+/*
     std::cout << "read file" << std::endl;
     std::cout << "c = " << r.m_nmbColumns << std::endl;
     std::cout << "r = " << r.m_nmbRows << std::endl;
@@ -31,7 +32,23 @@ int main (int , char *[])
     }
 
     std::cout << "u = " << r.m_unavailableSlots.size() << std::endl;
+*/
 
+    std::vector<size_t> serverPermutation;
+    serverPermutation.reserve(r.m_servers.size());
+    for (size_t i = 0; i != r.m_servers.size(); ++i)
+    {
+        serverPermutation.push_back(i);
+    }
+
+    std::sort(begin(serverPermutation), end(serverPermutation), [&r] (size_t lhs, size_t rhs){
+       return r.m_servers[lhs].getRatio() < r.m_servers[rhs].getRatio();
+    });
+
+    for (size_t serverIndex : serverPermutation)
+    {
+        std::cout << r.m_servers[serverIndex] << " r=" << r.m_servers[serverIndex].getRatio() << std::endl;
+    }
 
     Solution s;
 

@@ -12,6 +12,14 @@ public:
     {
     }
 
+    double getRatio() const
+    {
+        return static_cast<double>(m_capacity) / static_cast<double>(m_size);
+    }
+
+
+public:
+
     int32_t m_size;
     int32_t m_capacity;
 
