@@ -62,7 +62,7 @@ int main (int , char *[])
     {
         for (size_t i = 0; i < size; ++i)
         {
-            if (isAssigned(row, slot + i))
+            if (isAssigned(row, slot + i) == 1)
                 return false;
         }
         return true;
@@ -72,7 +72,9 @@ int main (int , char *[])
     {
         for (size_t i = 0; i < size; ++i)
         {
-            isAssigned(row, slot + i) = true;
+            if (isAssigned(row, slot + i) == 1)
+                throw "error";
+            isAssigned(row, slot + i) = 1;
         }
     };
 
