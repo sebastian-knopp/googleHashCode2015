@@ -19,5 +19,9 @@ public:
 };
 
 
+//size_t getRating(const Request a_request, const Solution& a_solution);
+
+
+
 std::ostream& operator<<(std::ostream& is, const Solution& a_solution);
 

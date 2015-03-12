@@ -22,7 +22,7 @@ public:
     Servers m_servers;
 
     //! Nmb pools to be created
-    int32_t m_nmbPools = 0;
+    size_t m_nmbPools = 0;
 
 };
 

@@ -141,6 +141,32 @@ int main (int , char *[])
         placeServer(serverIndex);
     }
 
+    auto getRating = [&] ()
+    {
+        size_t overallMin = std::numeric_limits<size_t>::max();
+        for (size_t poolIndex = 0; poolIndex != r.m_nmbPools; ++poolIndex)
+        {
+            size_t poolCapacity = 0;
+            for (size_t rowIndex = 0; rowIndex != r.m_nmbRows; ++rowIndex)
+            {
+                poolCapacity += assignedCapacity(rowIndex, poolIndex);
+            }
+
+            size_t poolMin = std::numeric_limits<size_t>::max();
+            for (size_t rowIndex = 0; rowIndex != r.m_nmbRows; ++rowIndex)
+            {
+                size_t currentMin = poolCapacity - assignedCapacity(rowIndex, poolIndex);
+                if (currentMin < poolMin)
+                    poolMin = currentMin;
+            }
+
+            if (poolMin < overallMin)
+                overallMin = poolMin;
+        }
+        return overallMin;
+    };
+
+    std::cout << "rating : " << getRating();
     //for ();
 
     std::ofstream ofs("D:\\googleHash\\out.txt");
