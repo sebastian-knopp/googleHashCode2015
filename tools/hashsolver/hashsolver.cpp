@@ -171,6 +171,7 @@ int main (int , char *[])
 
     boost::mt19937 rndGenerator;
     boost::random::uniform_int_distribution<> intDistribution(0, std::numeric_limits<int>::max());
+    boost::random::uniform_real_distribution<> realDistribution(0, 1.0);
 
     std::vector<size_t> placedServerIndices;
     for (size_t i = 0; i != r.m_servers.size(); ++i)
@@ -181,8 +182,9 @@ int main (int , char *[])
 
     Solution bestSolution = s;
     size_t bestRating = getRating();
+    double previousRating = static_cast<double>(bestRating);
     std::cout << "initial rating : " << bestRating << std::endl;
-
+/*
     for (size_t i = 0; i != 100000; ++i)
     {
         size_t randomIndex = placedServerIndices[intDistribution(rndGenerator) % placedServerIndices.size()];
@@ -202,6 +204,45 @@ int main (int , char *[])
             bestSolution = s;
             bestRating = newRating;
         }
+    }
+*/
+
+    double currentTemperature = 10.0;
+
+    for (size_t i = 0; i != 100000; ++i)
+    {
+        size_t randomIndex = placedServerIndices[intDistribution(rndGenerator) % placedServerIndices.size()];
+
+        size_t oldPoolIndex = s.m_servers[randomIndex].m_poolIndex;
+        size_t newPoolIndex = intDistribution(rndGenerator) % r.m_nmbPools;
+
+        s.m_servers[randomIndex].m_poolIndex = newPoolIndex;
+        assignedCapacity(s.m_servers[randomIndex].m_coord.m_row, oldPoolIndex) -= r.m_servers[randomIndex].m_capacity;
+        assignedCapacity(s.m_servers[randomIndex].m_coord.m_row, newPoolIndex) += r.m_servers[randomIndex].m_capacity;
+
+        double currentRating = static_cast<double>(getRating());
+
+        const double diff = previousRating - currentRating;
+        const double p = realDistribution(rndGenerator);
+        const double e = std::exp(-diff / currentTemperature);
+
+        if (p > e)
+        {
+            s.m_servers[randomIndex].m_poolIndex = oldPoolIndex;
+            assignedCapacity(s.m_servers[randomIndex].m_coord.m_row, oldPoolIndex) += r.m_servers[randomIndex].m_capacity;
+            assignedCapacity(s.m_servers[randomIndex].m_coord.m_row, newPoolIndex) -= r.m_servers[randomIndex].m_capacity;
+        }
+        else
+        {
+            previousRating = currentRating;
+            if (currentRating > bestRating)
+            {
+                bestSolution = s;
+                bestRating = currentRating;
+                std::cout << "new best rating : " << bestRating << std::endl;
+            }
+        }
+        currentTemperature *= 0.99;
     }
 
     //s.m_servers
