@@ -55,16 +55,35 @@ int main (int , char *[])
     // capacity of a pool in a row
     base::Vector2d<size_t> assignedCapacity(r.m_nmbRows, r.m_nmbPools, 0);
 
+    auto getPoolCapacity = [&] (size_t a_pool)
+    {
+        size_t nmbRows = assignedCapacity.width();
+        size_t c;
+        for (size_t i = 0; i < nmbRows; ++i)
+        {
+            c += assignedCapacity(i, a_pool);
+        }
+        return c;
+    };
+
     auto getPoolWithMinCapacity = [&] (size_t a_row)
     {
         size_t bestPool = 0;
+        size_t minCap = std::numeric_limits<size_t>::max();
         size_t nmbPools = assignedCapacity.height();
         size_t min = std::numeric_limits<size_t>::max();
         for (size_t i = 0; i < nmbPools; ++i)
         {
+            size_t poolCap = getPoolCapacity(i);
             if (assignedCapacity(a_row, i) < min)
             {
                 min = assignedCapacity(a_row, i);
+                minCap = poolCap;
+                bestPool = i;
+            }
+            else if (assignedCapacity(a_row, i) == min && minCap < poolCap)
+            {
+                minCap = poolCap;
                 bestPool = i;
             }
         }
@@ -131,7 +150,7 @@ int main (int , char *[])
 
     //for ();
 
-    std::ofstream ofs("out.txt");
+    std::ofstream ofs("D:\\googleHash\\out.txt");
     ofs << s;
 }
 
