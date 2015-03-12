@@ -7,7 +7,7 @@
 std::istream&operator>>(std::istream& is, Coordinate& a_coordinate)
 {
     is >> a_coordinate.m_row;
-    is >> a_coordinate.m_column;
+    is >> a_coordinate.m_slot;
     return is;
 }
 
@@ -15,6 +15,6 @@ std::istream&operator>>(std::istream& is, Coordinate& a_coordinate)
 
 std::ostream&operator<<(std::ostream& is, const Coordinate& a_server)
 {
-    is << "(row = " << a_server.m_row << ", column = " << a_server.m_column << ")";
+    is << a_server.m_row << " " << a_server.m_slot;
     return is;
 }

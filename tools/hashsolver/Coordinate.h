@@ -15,7 +15,7 @@ public:
 public:
 
     size_t m_row = 0;
-    size_t m_column = 0;
+    size_t m_slot = 0;
 };
 
 typedef std::vector<Coordinate> Coordinates;

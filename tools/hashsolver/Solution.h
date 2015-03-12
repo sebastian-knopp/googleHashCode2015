@@ -18,3 +18,6 @@ public:
 
 };
 
+
+std::ostream& operator<<(std::ostream& is, const Solution& a_solution);
+

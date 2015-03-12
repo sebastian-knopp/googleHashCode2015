@@ -29,3 +29,4 @@ public:
 typedef std::vector<PlacedServer> PlacedServers;
 
 
+std::ostream& operator<<(std::ostream& is, const PlacedServer& a_server);

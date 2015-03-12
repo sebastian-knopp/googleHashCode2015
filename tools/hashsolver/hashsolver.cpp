@@ -2,6 +2,7 @@
 #include <fstream>
 #include <limits>
 #include "Request.h"
+#include "Solution.h"
 
 
 int main (int , char *[])
@@ -30,6 +31,10 @@ int main (int , char *[])
     }
 
     std::cout << "u = " << r.m_unavailableSlots.size() << std::endl;
+
+
+    Solution s;
+    std::cout << s;
 }
 
 
