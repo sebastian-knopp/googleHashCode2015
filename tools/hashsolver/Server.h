@@ -20,5 +20,7 @@ public:
 typedef std::vector<Server> Servers;
 
 
-std::istream& operator>>(std::istream& is, Server& a_state);
+std::istream& operator>>(std::istream& is, Server& a_server);
+
+std::ostream& operator<<(std::ostream& is, const Server& a_server);
 

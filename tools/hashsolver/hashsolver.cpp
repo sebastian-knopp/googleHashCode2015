@@ -18,6 +18,17 @@ int main (int , char *[])
     std::cout << "r = " << r.m_nmbRows << std::endl;
     std::cout << "p = " << r.m_nmbPools << std::endl;
     std::cout << "s = " << r.m_servers.size() << std::endl;
+
+    for (const Server& s : r.m_servers)
+    {
+        std::cout << s << std::endl;
+    }
+
+    for (const Coordinate& c : r.m_unavailableSlots)
+    {
+        std::cout << c << std::endl;
+    }
+
     std::cout << "u = " << r.m_unavailableSlots.size() << std::endl;
 }
 
