@@ -62,7 +62,7 @@ int main (int , char *[])
     {
         for (size_t i = 0; i < size; ++i)
         {
-            if (isAssigned(row, slot))
+            if (isAssigned(row, slot + i))
                 return false;
         }
         return true;
@@ -72,15 +72,15 @@ int main (int , char *[])
     {
         for (size_t i = 0; i < size; ++i)
         {
-            isAssigned(row, slot) = true;
+            isAssigned(row, slot + i) = true;
         }
     };
 
     Solution s;
     s.m_servers.resize(r.m_servers.size());
 
-    for (size_t serverIndex : serverPermutation)
-    {
+    size_t currentPool = 0;
+    auto placeServer = [&] (size_t serverIndex) {
         const Server& server = r.m_servers[serverIndex];
         size_t currentRow = 0;
         while (currentRow < r.m_nmbRows)
@@ -93,13 +93,20 @@ int main (int , char *[])
                     place(currentRow, currentSlot, server.m_size);
                     s.m_servers[serverIndex].m_coord.m_row = currentRow;
                     s.m_servers[serverIndex].m_coord.m_slot = currentSlot;
-                    s.m_servers[serverIndex].m_poolIndex = 0;
-                    std::cout << "placed" << std::endl;
+                    s.m_servers[serverIndex].m_poolIndex = currentPool;
+                    ++currentPool;
+                    currentPool %= r.m_nmbPools;
+                    return;
                 }
                 ++currentSlot;
             }
             ++currentRow;
         }
+    };
+
+    for (size_t serverIndex : serverPermutation)
+    {
+        placeServer(serverIndex);
     }
 
     //for ();
