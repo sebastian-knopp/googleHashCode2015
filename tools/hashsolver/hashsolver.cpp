@@ -2,6 +2,9 @@
 #include <fstream>
 #include <limits>
 #include <algorithm>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_int_distribution.hpp>
+#include <boost/random/uniform_real_distribution.hpp>
 #include "Request.h"
 #include "Solution.h"
 #include "base/Vector2d.h"
@@ -166,7 +169,39 @@ int main (int , char *[])
         return overallMin;
     };
 
-    std::cout << "rating : " << getRating();
+    boost::mt19937 rndGenerator;
+    boost::random::uniform_int_distribution<> intDistribution(0, std::numeric_limits<int>::max());
+
+    std::vector<size_t> placedServerIndices;
+    for (size_t i = 0; i != r.m_servers.size(); ++i)
+    {
+        if (s.m_servers[i].isPlaced())
+            placedServerIndices.push_back(i);
+    }
+
+    Solution bestSolution = s;
+    size_t bestRating = getRating();
+    std::cout << "initial rating : " << bestRating << std::endl;
+
+    for (size_t i = 0; i != 1000; ++i)
+    {
+        size_t randomIndex = placedServerIndices[intDistribution(rndGenerator) % placedServerIndices.size()];
+
+        s.m_servers[randomIndex].m_poolIndex = 0;
+
+        size_t newRating = getRating();
+        std::cout << "new rating : " << newRating << std::endl;
+
+        if (newRating > bestRating)
+        {
+            bestSolution = s;
+            bestRating = newRating;
+        }
+    }
+
+    //s.m_servers
+
+
     //for ();
 
     std::ofstream ofs("D:\\googleHash\\out.txt");
