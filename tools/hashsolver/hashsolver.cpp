@@ -203,8 +203,12 @@ int main (int , char *[])
         }
         trueServerSize[i] = r.m_nmbSlots - s.m_servers[i].m_coord.m_slot;
     }
-
-
+/*
+    auto canSwap = [&] (size_t server1, size_t server2) {
+        return r.m_servers[server1].m_size <= trueServerSize[server2] &&
+               r.m_servers[server2].m_size <= trueServerSize[server1];
+    };
+*/
     double currentTemperature = 25.0;
     for (size_t i = 0; i != 1000000; ++i)
     {
@@ -213,32 +217,61 @@ int main (int , char *[])
         size_t oldPoolIndex = s.m_servers[randomIndex].m_poolIndex;
         size_t newPoolIndex = intDistribution(rndGenerator) % r.m_nmbPools;
 
-        s.m_servers[randomIndex].m_poolIndex = newPoolIndex;
-        assignedCapacity(s.m_servers[randomIndex].m_coord.m_row, oldPoolIndex) -= r.m_servers[randomIndex].m_capacity;
-        assignedCapacity(s.m_servers[randomIndex].m_coord.m_row, newPoolIndex) += r.m_servers[randomIndex].m_capacity;
-
-        double currentRating = static_cast<double>(getRating());
-
-        const double diff = previousRating - currentRating;
-        const double p = realDistribution(rndGenerator);
-        const double e = std::exp(-diff / currentTemperature);
-
-        if (p > e)
+        size_t moveType = intDistribution(rndGenerator) % 2;
+        if (moveType == 0)
         {
-            s.m_servers[randomIndex].m_poolIndex = oldPoolIndex;
-            assignedCapacity(s.m_servers[randomIndex].m_coord.m_row, oldPoolIndex) += r.m_servers[randomIndex].m_capacity;
-            assignedCapacity(s.m_servers[randomIndex].m_coord.m_row, newPoolIndex) -= r.m_servers[randomIndex].m_capacity;
+            s.m_servers[randomIndex].m_poolIndex = newPoolIndex;
+            assignedCapacity(s.m_servers[randomIndex].m_coord.m_row, oldPoolIndex) -= r.m_servers[randomIndex].m_capacity;
+            assignedCapacity(s.m_servers[randomIndex].m_coord.m_row, newPoolIndex) += r.m_servers[randomIndex].m_capacity;
+
+            double currentRating = static_cast<double>(getRating());
+
+            const double diff = previousRating - currentRating;
+            const double p = realDistribution(rndGenerator);
+            const double e = std::exp(-diff / currentTemperature);
+
+            if (p > e)
+            {
+                s.m_servers[randomIndex].m_poolIndex = oldPoolIndex;
+                assignedCapacity(s.m_servers[randomIndex].m_coord.m_row, oldPoolIndex) += r.m_servers[randomIndex].m_capacity;
+                assignedCapacity(s.m_servers[randomIndex].m_coord.m_row, newPoolIndex) -= r.m_servers[randomIndex].m_capacity;
+            }
+            else
+            {
+                previousRating = currentRating;
+            }
         }
         else
         {
-            previousRating = currentRating;
-            if (currentRating > bestRating)
+            s.m_servers[randomIndex].m_poolIndex = newPoolIndex;
+            assignedCapacity(s.m_servers[randomIndex].m_coord.m_row, oldPoolIndex) -= r.m_servers[randomIndex].m_capacity;
+            assignedCapacity(s.m_servers[randomIndex].m_coord.m_row, newPoolIndex) += r.m_servers[randomIndex].m_capacity;
+
+            double currentRating = static_cast<double>(getRating());
+
+            const double diff = previousRating - currentRating;
+            const double p = realDistribution(rndGenerator);
+            const double e = std::exp(-diff / currentTemperature);
+
+            if (p > e)
             {
-                bestSolution = s;
-                bestRating = currentRating;
-                std::cout << "new best rating : " << bestRating << std::endl;
+                s.m_servers[randomIndex].m_poolIndex = oldPoolIndex;
+                assignedCapacity(s.m_servers[randomIndex].m_coord.m_row, oldPoolIndex) += r.m_servers[randomIndex].m_capacity;
+                assignedCapacity(s.m_servers[randomIndex].m_coord.m_row, newPoolIndex) -= r.m_servers[randomIndex].m_capacity;
+            }
+            else
+            {
+                previousRating = currentRating;
             }
         }
+
+        if (previousRating > bestRating)
+        {
+            bestSolution = s;
+            bestRating = previousRating;
+            std::cout << "new best rating : " << bestRating << std::endl;
+        }
+
         currentTemperature *= 0.999;
     }
 
