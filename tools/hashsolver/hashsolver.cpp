@@ -52,6 +52,25 @@ int main (int , char *[])
     }
 */
 
+    // capacity of a pool in a row
+    base::Vector2d<size_t> assignedCapacity(r.m_nmbRows, r.m_nmbPools, 0);
+
+    auto getPoolWithMinCapacity = [&] (size_t a_row)
+    {
+        size_t bestPool = 0;
+        size_t nmbPools = assignedCapacity.height();
+        size_t min = std::numeric_limits<size_t>::max();
+        for (size_t i = 0; i < nmbPools; ++i)
+        {
+            if (assignedCapacity(a_row, i) < min)
+            {
+                min = assignedCapacity(a_row, i);
+                bestPool = i;
+            }
+        }
+        return bestPool;
+    };
+
     base::Vector2d<size_t> isAssigned(r.m_nmbRows, r.m_nmbSlots, 0);
     for (const Coordinate& c : r.m_unavailableSlots)
     {
@@ -81,7 +100,6 @@ int main (int , char *[])
     Solution s;
     s.m_servers.resize(r.m_servers.size());
 
-    size_t currentPool = 0;
     auto placeServer = [&] (size_t serverIndex) {
         const Server& server = r.m_servers[serverIndex];
         size_t currentRow = 0;
@@ -93,11 +111,11 @@ int main (int , char *[])
                 if (isAvailable(currentRow, currentSlot, server.m_size))
                 {
                     place(currentRow, currentSlot, server.m_size);
+                    size_t currentPool = getPoolWithMinCapacity(currentRow);
                     s.m_servers[serverIndex].m_coord.m_row = currentRow;
                     s.m_servers[serverIndex].m_coord.m_slot = currentSlot;
                     s.m_servers[serverIndex].m_poolIndex = currentPool;
-                    ++currentPool;
-                    currentPool %= r.m_nmbPools;
+                    assignedCapacity(currentRow, currentPool) += server.m_capacity;
                     return;
                 }
                 ++currentSlot;
