@@ -207,9 +207,9 @@ int main (int , char *[])
     }
 */
 
-    double currentTemperature = 10.0;
+    double currentTemperature = 25.0;
 
-    for (size_t i = 0; i != 100000; ++i)
+    for (size_t i = 0; i != 1000000; ++i)
     {
         size_t randomIndex = placedServerIndices[intDistribution(rndGenerator) % placedServerIndices.size()];
 
@@ -242,7 +242,7 @@ int main (int , char *[])
                 std::cout << "new best rating : " << bestRating << std::endl;
             }
         }
-        currentTemperature *= 0.99;
+        currentTemperature *= 0.999;
     }
 
     //s.m_servers
