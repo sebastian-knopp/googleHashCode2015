@@ -34,7 +34,11 @@ int main (int , char *[])
 
 
     Solution s;
-    std::cout << s;
+
+    std::ofstream ofs("out.txt");
+
+    s.m_servers.resize(r.m_servers.size());
+    ofs << s;
 }
 
 
