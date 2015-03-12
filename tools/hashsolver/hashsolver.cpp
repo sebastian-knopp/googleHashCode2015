@@ -209,50 +209,10 @@ int main (int , char *[])
                r.m_servers[server2].m_size <= trueServerSize[server1];
     };
 */
-    double currentTemperature = 25.0;
-    for (size_t i = 0; i != 1000000; ++i)
+    double currentTemperature = 50.0;
+    for (size_t i = 0; i != 10000000; ++i)
     {
         size_t randomIndex1 = placedServerIndices[intDistribution(rndGenerator) % placedServerIndices.size()];
-
-        //size_t moveType = intDistribution(rndGenerator) % 2;
-        /*
-        if (moveType == 0)
-        {
-            size_t randomIndex2 = placedServerIndices[intDistribution(rndGenerator) % placedServerIndices.size()];
-            if (!canSwap(randomIndex1, randomIndex2))
-                continue;
-
-            std::swap(s.m_servers[randomIndex1].m_coord, s.m_servers[randomIndex2].m_coord);
-            size_t pool1 = s.m_servers[randomIndex1].m_poolIndex;
-            size_t pool2 = s.m_servers[randomIndex2].m_poolIndex;
-
-            assignedCapacity(s.m_servers[randomIndex2].m_coord.m_row, pool1) += r.m_servers[randomIndex2].m_capacity;
-            assignedCapacity(s.m_servers[randomIndex1].m_coord.m_row, pool1) -= r.m_servers[randomIndex1].m_capacity;
-
-            assignedCapacity(s.m_servers[randomIndex1].m_coord.m_row, pool2) += r.m_servers[randomIndex1].m_capacity;
-            assignedCapacity(s.m_servers[randomIndex2].m_coord.m_row, pool2) -= r.m_servers[randomIndex2].m_capacity;
-
-
-            double currentRating = static_cast<double>(getRating());
-
-            const double diff = previousRating - currentRating;
-            const double p = realDistribution(rndGenerator);
-            const double e = std::exp(-diff / currentTemperature);
-
-            if (p > e)
-            {
-                assignedCapacity(s.m_servers[randomIndex2].m_coord.m_row, pool1) -= r.m_servers[randomIndex2].m_capacity;
-                assignedCapacity(s.m_servers[randomIndex1].m_coord.m_row, pool1) += r.m_servers[randomIndex1].m_capacity;
-
-                assignedCapacity(s.m_servers[randomIndex1].m_coord.m_row, pool2) -= r.m_servers[randomIndex1].m_capacity;
-                assignedCapacity(s.m_servers[randomIndex2].m_coord.m_row, pool2) += r.m_servers[randomIndex2].m_capacity;
-            }
-            else
-            {
-                previousRating = currentRating;
-            }
-        }
-        else*/
         {
             size_t oldPoolIndex = s.m_servers[randomIndex1].m_poolIndex;
             size_t newPoolIndex = intDistribution(rndGenerator) % r.m_nmbPools;
@@ -283,10 +243,11 @@ int main (int , char *[])
         {
             bestSolution = s;
             bestRating = previousRating;
-            std::cout << "new best rating : " << bestRating << std::endl;
+            std::cout << "new best rating : "<< bestRating << std::endl;
+            std::cout << "i: "<< i << std::endl;
         }
 
-        currentTemperature *= 0.999;
+        currentTemperature *= 0.9;
     }
 
     //s.m_servers
