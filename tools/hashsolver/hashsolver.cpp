@@ -69,21 +69,14 @@ int main (int , char *[])
     auto getPoolWithMinCapacity = [&] (size_t a_row)
     {
         size_t bestPool = 0;
-        size_t minCap = std::numeric_limits<size_t>::max();
-        size_t nmbPools = assignedCapacity.height();
         size_t min = std::numeric_limits<size_t>::max();
+        size_t nmbPools = assignedCapacity.height();
         for (size_t i = 0; i < nmbPools; ++i)
         {
-            size_t poolCap = getPoolCapacity(i);
-            if (assignedCapacity(a_row, i) < min)
+            size_t poolCap = getPoolCapacity(i) + assignedCapacity(a_row, i);
+            if (poolCap < min)
             {
-                min = assignedCapacity(a_row, i);
-                minCap = poolCap;
-                bestPool = i;
-            }
-            else if (assignedCapacity(a_row, i) == min && minCap < poolCap)
-            {
-                minCap = poolCap;
+                min = poolCap;
                 bestPool = i;
             }
         }
