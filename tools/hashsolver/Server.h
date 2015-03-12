@@ -20,8 +20,8 @@ public:
 
 public:
 
-    int32_t m_size;
-    int32_t m_capacity;
+    size_t m_size;
+    size_t m_capacity;
 
 };
 

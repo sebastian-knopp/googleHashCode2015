@@ -184,31 +184,28 @@ int main (int , char *[])
     size_t bestRating = getRating();
     double previousRating = static_cast<double>(bestRating);
     std::cout << "initial rating : " << bestRating << std::endl;
-/*
-    for (size_t i = 0; i != 100000; ++i)
+
+
+    std::vector<size_t> trueServerSize(r.m_servers.size(), 0);
+    for (size_t i = 0; i != r.m_servers.size(); ++i)
     {
-        size_t randomIndex = placedServerIndices[intDistribution(rndGenerator) % placedServerIndices.size()];
-
-        size_t oldPoolIndex = s.m_servers[randomIndex].m_poolIndex;
-        size_t newPoolIndex = intDistribution(rndGenerator) % r.m_nmbPools;
-        s.m_servers[randomIndex].m_poolIndex = newPoolIndex;
-
-        assignedCapacity(s.m_servers[randomIndex].m_coord.m_row, oldPoolIndex) -= r.m_servers[randomIndex].m_capacity;
-        assignedCapacity(s.m_servers[randomIndex].m_coord.m_row, newPoolIndex) += r.m_servers[randomIndex].m_capacity;
-
-        size_t newRating = getRating();
-        std::cout << "new rating : " << newRating << std::endl;
-
-        if (newRating > bestRating)
+        trueServerSize[i] = r.m_servers[i].m_size;
+        size_t slotIndex = s.m_servers[i].m_coord.m_slot + r.m_servers[i].m_size;
+        while (slotIndex < r.m_nmbSlots)
         {
-            bestSolution = s;
-            bestRating = newRating;
+            if (isAssigned(s.m_servers[i].m_coord.m_row, slotIndex))
+            {
+                trueServerSize[i] = slotIndex - s.m_servers[i].m_coord.m_slot;
+                break;
+            }
+
+            ++slotIndex;
         }
+        trueServerSize[i] = r.m_nmbSlots - s.m_servers[i].m_coord.m_slot;
     }
-*/
+
 
     double currentTemperature = 25.0;
-
     for (size_t i = 0; i != 1000000; ++i)
     {
         size_t randomIndex = placedServerIndices[intDistribution(rndGenerator) % placedServerIndices.size()];
