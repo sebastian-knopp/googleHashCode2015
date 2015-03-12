@@ -88,7 +88,7 @@ int main (int , char *[])
         while (currentRow < r.m_nmbRows)
         {
             size_t currentSlot = 0;
-            while (currentSlot < r.m_nmbSlots)
+            while (currentSlot < r.m_nmbSlots - server.m_size)
             {
                 if (isAvailable(currentRow, currentSlot, server.m_size))
                 {
