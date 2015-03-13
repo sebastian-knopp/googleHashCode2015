@@ -79,12 +79,7 @@ int main (int , char *[])
                 {
                     if (s.isPlacable(currentCoord, serverIndex))
                     {
-                        s.placeServer(currentCoord, serverIndex);
-                        size_t currentPool = s.getPoolWithMinCapacity(currentCoord.m_row);
-                        s.m_servers[serverIndex].m_coord.m_row = currentCoord.m_row;
-                        s.m_servers[serverIndex].m_coord.m_slot = currentCoord.m_slot;
-                        s.m_servers[serverIndex].m_poolIndex = currentPool;
-                        s.m_assignedCapacity(currentCoord.m_row, currentPool) += server.m_capacity;
+                        s.placeServer(currentCoord, serverIndex, s.getPoolWithMinCapacity(currentCoord.m_row));
                         return;
                     }
                     ++currentCoord.m_slot;

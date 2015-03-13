@@ -57,7 +57,7 @@ bool Solution::isPlacable(const Coordinate& a_coord, size_t a_serverIndex) const
 }
 
 
-void Solution::placeServer(const Coordinate& a_coord, size_t a_serverIndex)
+void Solution::placeServer(const Coordinate& a_coord, size_t a_serverIndex, size_t a_poolIndex)
 {
     for (size_t i = 0; i < m_request->m_servers[a_serverIndex].m_size; ++i)
     {
@@ -65,6 +65,9 @@ void Solution::placeServer(const Coordinate& a_coord, size_t a_serverIndex)
             throw "error";
         m_isAssigned(a_coord.m_row, a_coord.m_slot + i) = 1;
     }
+    m_servers[a_serverIndex].m_coord = a_coord;
+    m_servers[a_serverIndex].m_poolIndex = a_poolIndex;
+    m_assignedCapacity(a_coord.m_row, a_poolIndex) += m_request->m_servers[a_serverIndex].m_capacity;
 }
 
 

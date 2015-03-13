@@ -28,7 +28,7 @@ public:
 
     bool isPlacable(const Coordinate& a_coord, size_t a_serverIndex) const;
 
-    void placeServer(const Coordinate& a_coord, size_t a_serverIndex);
+    void placeServer(const Coordinate& a_coord, size_t a_serverIndex, size_t a_poolIndex);
 
     size_t getPoolCapacity(size_t a_pool) const;
 
