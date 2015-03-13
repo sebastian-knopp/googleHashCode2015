@@ -69,18 +69,37 @@ void Solution::placeServer(const Coordinate& a_coord, size_t a_serverIndex, size
     if (a_poolIndex == std::numeric_limits<size_t>::max())
         return;
 
+    server.m_coord = a_coord;
     for (size_t i = 0; i < m_request->m_servers[a_serverIndex].m_size; ++i)
     {
-        if (m_isAssigned(a_coord.m_row, a_coord.m_slot + i) == 1)
+        if (m_isAssigned(server.m_coord.m_row, server.m_coord.m_slot + i) == 1)
         {
             std::cerr << "invalid placement" << std::endl;
             throw "error";
         }
-        m_isAssigned(a_coord.m_row, a_coord.m_slot + i) = 1;
+        m_isAssigned(server.m_coord.m_row, server.m_coord.m_slot + i) = 1;
     }
-    server.m_coord = a_coord;
     server.m_poolIndex = a_poolIndex;
-    m_assignedCapacity(a_coord.m_row, a_poolIndex) += m_request->m_servers[a_serverIndex].m_capacity;
+    m_assignedCapacity(server.m_coord.m_row, a_poolIndex) += m_request->m_servers[a_serverIndex].m_capacity;
+}
+
+
+void Solution::alignLeft(size_t a_serverIndex)
+{
+    PlacedServer old = m_servers[a_serverIndex];
+    removeServer(a_serverIndex);
+
+    Coordinate coord = old.m_coord;
+
+    size_t slot = coord.m_slot;
+    while (slot > 0 && m_isAssigned(coord.m_row, slot - 1) == 0)
+    {
+        --slot;
+        std::cout << "left" << std::endl;
+    }
+    coord.m_slot = slot;
+
+    placeServer(coord, a_serverIndex, old.m_poolIndex);
 }
 
 
@@ -267,6 +286,9 @@ Solution simulatedAnnealing(std::mt19937& rndGenerator,
                 continue;
 
             s.swapServers(randomIndex1, randomIndex2);
+            s.alignLeft(randomIndex1);
+            s.alignLeft(randomIndex2);
+
             if (!s.canSwapServers(randomIndex2, randomIndex1))
             {
                 s.printServerInfo(randomIndex1);

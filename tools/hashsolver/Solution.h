@@ -30,6 +30,8 @@ public:
 
     void placeServer(const Coordinate& a_coord, size_t a_serverIndex, size_t a_poolIndex);
 
+    void alignLeft(size_t a_serverIndex);
+
     void removeServer(size_t a_serverIndex);
 
     size_t getPoolCapacity(size_t a_pool) const;
