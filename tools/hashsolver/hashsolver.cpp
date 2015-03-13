@@ -2,9 +2,9 @@
 #include <fstream>
 #include <limits>
 #include <algorithm>
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/uniform_int_distribution.hpp>
-#include <boost/random/uniform_real_distribution.hpp>
+#include <random>
+//#include <boost/random/uniform_int_distribution.hpp>
+//#include <boost/random/uniform_real_distribution.hpp>
 #include "Request.h"
 #include "Solution.h"
 #include "base/Vector2d.h"
@@ -94,9 +94,10 @@ int main (int , char *[])
         }
 
     }
-    boost::mt19937 rndGenerator;
-    boost::random::uniform_int_distribution<> intDistribution(0, std::numeric_limits<int>::max());
-    boost::random::uniform_real_distribution<> realDistribution(0, 1.0);
+
+    std::mt19937 rndGenerator;
+    std::uniform_int_distribution<> intDistribution(0, std::numeric_limits<int>::max());
+    std::uniform_real_distribution<> realDistribution(0, 1.0);
 
     Solution s = bestSolution;
 
