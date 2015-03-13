@@ -59,6 +59,13 @@ bool Solution::isPlacable(const Coordinate& a_coord, size_t a_serverIndex) const
 
 void Solution::placeServer(const Coordinate& a_coord, size_t a_serverIndex, size_t a_poolIndex)
 {
+    PlacedServer& server = m_servers[a_serverIndex];
+    if (server.m_poolIndex != std::numeric_limits<size_t>::max())
+    {
+        std::cerr << "Server already placed." << std::endl;
+        throw "huh";
+    }
+
     if (a_poolIndex == std::numeric_limits<size_t>::max())
         return;
 
@@ -71,8 +78,8 @@ void Solution::placeServer(const Coordinate& a_coord, size_t a_serverIndex, size
         }
         m_isAssigned(a_coord.m_row, a_coord.m_slot + i) = 1;
     }
-    m_servers[a_serverIndex].m_coord = a_coord;
-    m_servers[a_serverIndex].m_poolIndex = a_poolIndex;
+    server.m_coord = a_coord;
+    server.m_poolIndex = a_poolIndex;
     m_assignedCapacity(a_coord.m_row, a_poolIndex) += m_request->m_servers[a_serverIndex].m_capacity;
 }
 
@@ -88,6 +95,11 @@ void Solution::removeServer(size_t a_serverIndex)
 
     for (size_t i = 0; i < m_request->m_servers[a_serverIndex].m_size; ++i)
     {
+        if (m_isAssigned(server.m_coord.m_row, server.m_coord.m_slot + i) == 0)
+        {
+            std::cerr << "expected unassigned slot" << std::endl;
+            throw "error";
+        }
         m_isAssigned(server.m_coord.m_row, server.m_coord.m_slot + i) = 0;
     }
     m_servers[a_serverIndex] = PlacedServer();
@@ -123,12 +135,41 @@ size_t Solution::getPoolWithMinCapacity(size_t a_row) const
     return bestPool;
 }
 
-/*
-bool Solution::canSwapServers(size_t a_server1, size_t a_server2)
+
+bool Solution::canSwapServers(const size_t a_server1, const size_t a_server2)
 {
-    return false;
+    auto canMoveFromTo = [&] (const size_t a_from, const size_t a_to)
+    {
+        PlacedServer to = m_servers[a_to];
+        removeServer(a_to);
+        const bool result = isPlacable(to.m_coord, a_from);
+        placeServer(to.m_coord, a_to, to.m_poolIndex);
+        return result;
+    };
+    return canMoveFromTo(a_server1, a_server2) && canMoveFromTo(a_server2, a_server1);
 }
-*/
+
+
+void Solution::swapServers(size_t a_server1, size_t a_server2)
+{
+    PlacedServer placed1 = m_servers[a_server1];
+    PlacedServer placed2 = m_servers[a_server2];
+    removeServer(a_server1);
+    removeServer(a_server2);
+    placeServer(placed1.m_coord, a_server1, placed1.m_poolIndex);
+    placeServer(placed2.m_coord, a_server2, placed2.m_poolIndex);
+}
+
+
+void Solution::printServerInfo(size_t serverIndex)
+{
+    std::cout << "Server " << serverIndex
+              << " size = " << m_request->m_servers[serverIndex].m_size
+              << " coords = " << m_servers[serverIndex].m_coord
+              << " pool = " << m_servers[serverIndex].m_poolIndex
+              << std::endl;
+}
+
 
 std::ostream& operator<<(std::ostream& is, const Solution& a_solution)
 {
@@ -174,7 +215,7 @@ Solution simulatedAnnealing(std::mt19937& rndGenerator,
     for (size_t i = 0; i != runs; ++i)
     {
         size_t moveType = intDistribution(rndGenerator) % 2;
-        if (moveType == 1)
+        if (moveType == 0)
         {
             size_t randomIndex1 = placedServerIndices[intDistribution(rndGenerator) % placedServerIndices.size()];
 
@@ -214,46 +255,25 @@ Solution simulatedAnnealing(std::mt19937& rndGenerator,
         }
         else
         {
-            size_t randomIndex1 = placedServerIndices[intDistribution(rndGenerator) % placedServerIndices.size()];
-            size_t randomIndex2 = placedServerIndices[intDistribution(rndGenerator) % placedServerIndices.size()];
+            size_t randomIndex1 = intDistribution(rndGenerator) % s.m_servers.size();
+            size_t randomIndex2 = intDistribution(rndGenerator) % s.m_servers.size();
 
             if (randomIndex1 == randomIndex2)
             {
                 randomIndex2 = (randomIndex2 + 1) % s.m_servers.size();
             }
 
-            PlacedServer old1 = s.m_servers[randomIndex1];
-            PlacedServer old2 = s.m_servers[randomIndex2];
-
-            s.removeServer(randomIndex1);
-            s.removeServer(randomIndex2);
-
-            if (s.isPlacable(old2.m_coord, randomIndex1))
-            {
-                s.placeServer(old2.m_coord, randomIndex1, old1.m_poolIndex);
-            }
-            else
-            {
-                s.placeServer(old2.m_coord, randomIndex2, old2.m_poolIndex);
-                s.placeServer(old1.m_coord, randomIndex1, old1.m_poolIndex);
+            if (!s.canSwapServers(randomIndex1, randomIndex2))
                 continue;
-            }
 
-            if (s.isPlacable(old1.m_coord, randomIndex2))
+            s.swapServers(randomIndex1, randomIndex2);
+            if (!s.canSwapServers(randomIndex2, randomIndex1))
             {
-                s.placeServer(old1.m_coord, randomIndex2, old1.m_poolIndex);
+                s.printServerInfo(randomIndex1);
+                s.printServerInfo(randomIndex2);
+                std::cout << "huh?" << std::endl;
+                throw "hu";
             }
-            else
-            {
-                s.removeServer(randomIndex1);
-                s.placeServer(old2.m_coord, randomIndex2, old2.m_poolIndex);
-                s.placeServer(old1.m_coord, randomIndex1, old1.m_poolIndex);
-            }
-
-            s.removeServer(randomIndex1);
-            s.removeServer(randomIndex2);
-            s.placeServer(old2.m_coord, randomIndex2, old2.m_poolIndex);
-            s.placeServer(old1.m_coord, randomIndex1, old1.m_poolIndex);
 
             double currentRating = static_cast<double>(s.getRating());
 
@@ -263,6 +283,7 @@ Solution simulatedAnnealing(std::mt19937& rndGenerator,
 
             if (p > e)
             {
+                s.swapServers(randomIndex2, randomIndex1);
             }
             else
             {

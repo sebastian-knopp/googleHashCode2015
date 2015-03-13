@@ -44,7 +44,7 @@ int main (int , char *[])
     Solution bestSolution(r);
     size_t bestRating = bestSolution.getRating();
 
-    for (size_t i = 0; i != 200; ++i)
+    for (size_t i = 0; i != 100; ++i)
     {
         Solution s(r);
 
@@ -93,7 +93,7 @@ int main (int , char *[])
             placeServer(serverIndex);
         }
 
-        s = simulatedAnnealing(rndGenerator, s, 20.0, 0.9, 100, false);
+        //s = simulatedAnnealing(rndGenerator, s, 20.0, 0.9, 100, false);
 
         size_t rating = s.getRating();
         if (rating > bestRating)
@@ -136,7 +136,7 @@ int main (int , char *[])
 
     //s.m_servers
 
-    bestSolution = simulatedAnnealing(rndGenerator, bestSolution, 50.0, 0.9999, 1000000, true);
+    bestSolution = simulatedAnnealing(rndGenerator, bestSolution, 50.0, 0.9999, 10000000, true);
 
     std::cout << "best rating : " << bestSolution.getRating() << std::endl;
 

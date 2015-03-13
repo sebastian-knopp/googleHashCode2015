@@ -38,6 +38,10 @@ public:
 
     bool canSwapServers(size_t a_server1, size_t a_server2);
 
+    void swapServers(size_t a_server1, size_t a_server2);
+
+    void printServerInfo(size_t serverIndex);
+
 
 public:
 
