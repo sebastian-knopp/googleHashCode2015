@@ -16,12 +16,33 @@ Solution::Solution(const Request& a_request)
 }
 
 
+void Solution::printBalance() const
+{
+    for (size_t poolIndex = 0; poolIndex != getNmbPools(); ++poolIndex)
+    {
+        std::cout << "pool " << poolIndex;
+        size_t poolCapacity = 0;
+        for (size_t rowIndex = 0; rowIndex != getNmbRows(); ++rowIndex)
+        {
+            poolCapacity += m_assignedCapacity(rowIndex, poolIndex);
+        }
+
+        std::cout << " c= " << poolCapacity;
+        size_t poolMin = std::numeric_limits<size_t>::max();
+        for (size_t rowIndex = 0; rowIndex != getNmbRows(); ++rowIndex)
+        {
+            size_t currentMin = poolCapacity - m_assignedCapacity(rowIndex, poolIndex);
+            if (currentMin < poolMin)
+                poolMin = currentMin;
+        }
+
+        std::cout << " min= " << poolMin << std::endl;
+    }
+}
+
+
 size_t Solution::getRating() const
 {
-    std::mt19937 rndGenerator;
-    std::uniform_int_distribution<> intDistribution(0, std::numeric_limits<int>::max());
-    std::uniform_real_distribution<> realDistribution(0, 1.0);
-
     size_t overallMin = std::numeric_limits<size_t>::max();
     for (size_t poolIndex = 0; poolIndex != getNmbPools(); ++poolIndex)
     {
@@ -43,6 +64,83 @@ size_t Solution::getRating() const
             overallMin = poolMin;
     }
     return overallMin;
+}
+
+size_t Solution::getCriticalServer() const
+{
+    size_t criticalRow = 0;
+    size_t criticalPool = 0;
+
+    size_t overallMin = std::numeric_limits<size_t>::max();
+    for (size_t poolIndex = 0; poolIndex != getNmbPools(); ++poolIndex)
+    {
+        size_t poolCapacity = 0;
+        for (size_t rowIndex = 0; rowIndex != getNmbRows(); ++rowIndex)
+        {
+            poolCapacity += m_assignedCapacity(rowIndex, poolIndex);
+        }
+
+        size_t criticalRowCandidate = 0;
+        size_t poolMin = std::numeric_limits<size_t>::max();
+        for (size_t rowIndex = 0; rowIndex != getNmbRows(); ++rowIndex)
+        {
+            size_t currentMin = poolCapacity - m_assignedCapacity(rowIndex, poolIndex);
+            if (currentMin < poolMin)
+            {
+                poolMin = currentMin;
+                criticalRowCandidate = rowIndex;
+            }
+        }
+
+        if (poolMin < overallMin)
+        {
+            overallMin = poolMin;
+            criticalRow = criticalRowCandidate;
+            criticalPool = poolIndex;
+        }
+    }
+
+    size_t smallestSize = std::numeric_limits<size_t>::max();
+    size_t csIndex = 0;
+
+    for (size_t s = 0; s != m_servers.size(); ++s)
+    {
+        const PlacedServer& ps = m_servers[s];
+        const Server& rs = m_request->m_servers[s];
+        if (ps.m_coord.m_row != criticalRow)
+            continue;
+        if (ps.m_poolIndex != criticalPool)
+            continue;
+
+        if (rs.m_size < smallestSize)
+        {
+            smallestSize = rs.m_size;
+            csIndex = s;
+        }
+    }
+    return csIndex;
+}
+
+
+size_t Solution::getCapacityRange() const
+{
+    size_t min = std::numeric_limits<size_t>::max();
+    size_t max = 0;
+    for (size_t poolIndex = 0; poolIndex != getNmbPools(); ++poolIndex)
+    {
+        size_t poolCapacity = 0;
+        for (size_t rowIndex = 0; rowIndex != getNmbRows(); ++rowIndex)
+        {
+            poolCapacity += m_assignedCapacity(rowIndex, poolIndex);
+        }
+
+        if (poolCapacity < min)
+            min = poolCapacity;
+
+        if (poolCapacity > max)
+            max = poolCapacity;
+    }
+    return min;
 }
 
 
@@ -198,7 +296,7 @@ void Solution::printSolution() const
     {
         for (size_t i = 0; i < m_request->m_servers[s].m_size; ++i)
         {
-            draw(m_servers[s].m_coord.m_row, m_servers[s].m_coord.m_slot + i) = 2;
+            draw(m_servers[s].m_coord.m_row, m_servers[s].m_coord.m_slot + i) = 2 + m_servers[s].m_poolIndex;
         }
     }
 
@@ -209,9 +307,9 @@ void Solution::printSolution() const
             if (draw(row, slot) == 0)
                 std::cout << "O";
             else if (draw(row, slot) == 1)
-                std::cout << "x";
-            else if (draw(row, slot) == 2)
-                std::cout << "s";
+                std::cout << "X";
+            else if (draw(row, slot) > 1)
+                std::cout << static_cast<char>('a' + (draw(row, slot)%26));
         }
         std::cout << "\n";
     }
@@ -262,10 +360,12 @@ Solution simulatedAnnealing(std::mt19937& rndGenerator,
     double currentTemperature = initialTemperature;
     for (size_t i = 0; i != runs; ++i)
     {
-        size_t moveType = intDistribution(rndGenerator) % 2;
-        if (moveType < 1)
+        size_t moveType = intDistribution(rndGenerator) % 6;
+        if (moveType < 4)
         {
             size_t randomIndex1 = placedServerIndices[intDistribution(rndGenerator) % placedServerIndices.size()];
+            if (moveType == 0)
+                randomIndex1 =  s.getCriticalServer();
 
             PlacedServer old = s.m_servers[randomIndex1];
             size_t oldPoolIndex = s.m_servers[randomIndex1].m_poolIndex;
@@ -274,7 +374,7 @@ Solution simulatedAnnealing(std::mt19937& rndGenerator,
             s.removeServer(randomIndex1);
             s.placeServer(old.m_coord, randomIndex1, newPoolIndex);
 
-            double currentRating = static_cast<double>(s.getRating());
+            double currentRating = static_cast<double>(s.getRating()) * 10 + static_cast<double>(s.getCapacityRange());
 
             const double diff = previousRating - currentRating;
             const double p = realDistribution(rndGenerator);
@@ -304,6 +404,11 @@ Solution simulatedAnnealing(std::mt19937& rndGenerator,
         else
         {
             size_t randomIndex1 = intDistribution(rndGenerator) % s.m_servers.size();
+
+            if (moveType % 2 == 0)
+                randomIndex1 =  s.getCriticalServer();
+
+            s.getCriticalServer();
             size_t randomIndex2 = intDistribution(rndGenerator) % s.m_servers.size();
 
             if (randomIndex1 == randomIndex2)
@@ -326,7 +431,7 @@ Solution simulatedAnnealing(std::mt19937& rndGenerator,
                 throw "hu";
             }
 */
-            double currentRating = static_cast<double>(s.getRating());
+            double currentRating = static_cast<double>(s.getRating()) * 10 + static_cast<double>(s.getCapacityRange());
 
             const double diff = previousRating - currentRating;
             const double p = realDistribution(rndGenerator);

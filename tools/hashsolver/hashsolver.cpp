@@ -91,15 +91,15 @@ int main (int , char *[])
 
         //        return simulatedAnnealing(rndGenerator, s, 5.0, 0.99, 1000, false);
 
-        const Solution result = simulatedAnnealing(rndGenerator, s, 20.0, 0.9999, 5000000, false);
+        const Solution result = simulatedAnnealing(rndGenerator, s, 5.0, 0.99, 500000, false);
         //std::cout << "end " << a_runIndex << " ("<< result.getRating() << ")" << std::endl;
         return result;
     };
 
     std::atomic<size_t> currentSolutionIndex(0);
 
-    const size_t nmbCalculations = 16;
-    const size_t nmbThreads = 8;
+    const size_t nmbCalculations = 600;
+    const size_t nmbThreads = 4;
 
     Solution bestSolution(r);
     size_t bestRating = bestSolution.getRating();
@@ -159,8 +159,9 @@ int main (int , char *[])
 
     std::cout << "best rating : " << bestSolution.getRating() << std::endl;
 */
-    //s.printSolution();
-
+    bestSolution.printSolution();
+    bestSolution.printBalance();bestSolution.getCapacityRange();
+    std::cout << "r= " << bestSolution.getCapacityRange() << std::endl;
 
     std::ofstream ofs("D:\\googleHash\\out.txt");
     ofs << bestSolution;

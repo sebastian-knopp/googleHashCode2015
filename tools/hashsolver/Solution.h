@@ -14,7 +14,13 @@ public:
 
     explicit Solution(const Request& a_request);
 
+    void printBalance() const;
+
     size_t getRating() const;
+
+    size_t getCriticalServer() const;
+
+    size_t getCapacityRange() const;
 
     inline size_t getNmbRows() const
     {
