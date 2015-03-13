@@ -8,8 +8,9 @@ class Solution {
 
 public:
 
-    Solution(size_t a_nmbRows, size_t a_nmbPools)
+    Solution(size_t a_nmbRows, size_t a_nmbPools, size_t a_nmbSlots)
     : m_assignedCapacity(a_nmbRows, a_nmbPools, 0)
+    , m_isAssigned(a_nmbRows, a_nmbSlots, 0)
     {
     }
 
@@ -30,6 +31,9 @@ public:
     PlacedServers m_servers;
 
     base::Vector2d<size_t> m_assignedCapacity;
+
+    base::Vector2d<size_t> m_isAssigned;
+
 
 };
 

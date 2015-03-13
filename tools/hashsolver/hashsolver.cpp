@@ -49,7 +49,7 @@ int main (int , char *[])
        return r.m_servers[lhs].getRatio() > r.m_servers[rhs].getRatio();
     });
 
-    Solution s(r.m_nmbRows, r.m_nmbPools);
+    Solution s(r.m_nmbRows, r.m_nmbPools, r.m_nmbSlots);
     s.m_servers.resize(r.m_servers.size());
 
 /*
@@ -89,17 +89,16 @@ int main (int , char *[])
         return bestPool;
     };
 
-    base::Vector2d<size_t> isAssigned(r.m_nmbRows, r.m_nmbSlots, 0);
     for (const Coordinate& c : r.m_unavailableSlots)
     {
-        isAssigned(c.m_row, c.m_slot) = 1;
+        s.m_isAssigned(c.m_row, c.m_slot) = 1;
     }
 
     auto isAvailable = [&] (const Coordinate& a_coord, size_t size)
     {
         for (size_t i = 0; i < size; ++i)
         {
-            if (isAssigned(a_coord.m_row, a_coord.m_slot + i) == 1)
+            if (s.m_isAssigned(a_coord.m_row, a_coord.m_slot + i) == 1)
                 return false;
         }
         return true;
@@ -109,9 +108,9 @@ int main (int , char *[])
     {
         for (size_t i = 0; i < size; ++i)
         {
-            if (isAssigned(row, slot + i) == 1)
+            if (s.m_isAssigned(row, slot + i) == 1)
                 throw "error";
-            isAssigned(row, slot + i) = 1;
+            s.m_isAssigned(row, slot + i) = 1;
         }
     };
 
