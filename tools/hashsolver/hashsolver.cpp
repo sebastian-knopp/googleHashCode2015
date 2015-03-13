@@ -137,6 +137,9 @@ int main (int , char *[])
     //s.m_servers
 
     bestSolution = simulatedAnnealing(rndGenerator, bestSolution, 50.0, 0.9999, 1000000, true);
+
+    std::cout << "best rating : " << bestSolution.getRating() << std::endl;
+
     //for ();
 
     std::ofstream ofs("D:\\googleHash\\out.txt");
