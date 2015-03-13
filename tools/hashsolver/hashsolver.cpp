@@ -52,32 +52,6 @@ int main (int , char *[])
     Solution s(r);
     s.m_servers.resize(r.m_servers.size());
 
-
-    for (const Coordinate& c : r.m_unavailableSlots)
-    {
-        s.m_isAssigned(c.m_row, c.m_slot) = 1;
-    }
-
-    auto isAvailable = [&] (const Coordinate& a_coord, size_t size)
-    {
-        for (size_t i = 0; i < size; ++i)
-        {
-            if (s.m_isAssigned(a_coord.m_row, a_coord.m_slot + i) == 1)
-                return false;
-        }
-        return true;
-    };
-
-    auto place = [&] (const Coordinate& a_coord, size_t size)
-    {
-        for (size_t i = 0; i < size; ++i)
-        {
-            if (s.m_isAssigned(a_coord.m_row, a_coord.m_slot + i) == 1)
-                throw "error";
-            s.m_isAssigned(a_coord.m_row, a_coord.m_slot + i) = 1;
-        }
-    };
-
     auto placeServer = [&] (size_t serverIndex) {
         const Server& server = r.m_servers[serverIndex];
         Coordinate currentCoord;
@@ -86,9 +60,9 @@ int main (int , char *[])
             currentCoord.m_slot = 0;
             while (currentCoord.m_slot < r.m_nmbSlots - server.m_size)
             {
-                if (isAvailable(currentCoord, server.m_size))
+                if (s.isAvailable(currentCoord, server.m_size))
                 {
-                    place(currentCoord, server.m_size);
+                    s.placeServer(currentCoord, server.m_size);
                     size_t currentPool = s.getPoolWithMinCapacity(currentCoord.m_row);
                     s.m_servers[serverIndex].m_coord.m_row = currentCoord.m_row;
                     s.m_servers[serverIndex].m_coord.m_slot = currentCoord.m_slot;

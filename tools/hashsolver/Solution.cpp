@@ -7,6 +7,10 @@ Solution::Solution(const Request& a_request)
 : m_assignedCapacity(a_request.m_nmbRows, a_request.m_nmbPools, 0)
 , m_isAssigned(a_request.m_nmbRows, a_request.m_nmbSlots, 0)
 {
+    for (const Coordinate& c : a_request.m_unavailableSlots)
+    {
+        m_isAssigned(c.m_row, c.m_slot) = 1;
+    }
 }
 
 
@@ -33,6 +37,28 @@ size_t Solution::getRating() const
             overallMin = poolMin;
     }
     return overallMin;
+}
+
+
+bool Solution::isAvailable(const Coordinate& a_coord, size_t size) const
+{
+    for (size_t i = 0; i < size; ++i)
+    {
+        if (m_isAssigned(a_coord.m_row, a_coord.m_slot + i) == 1)
+            return false;
+    }
+    return true;
+}
+
+
+void Solution::placeServer(const Coordinate& a_coord, size_t size)
+{
+    for (size_t i = 0; i < size; ++i)
+    {
+        if (m_isAssigned(a_coord.m_row, a_coord.m_slot + i) == 1)
+            throw "error";
+        m_isAssigned(a_coord.m_row, a_coord.m_slot + i) = 1;
+    }
 }
 
 

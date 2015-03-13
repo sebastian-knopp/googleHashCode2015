@@ -24,6 +24,10 @@ public:
         return m_assignedCapacity.height();
     }
 
+    bool isAvailable(const Coordinate& a_coord, size_t size) const;
+
+    void placeServer(const Coordinate& a_coord, size_t size);
+
     size_t getPoolCapacity(size_t a_pool) const;
 
     size_t getPoolWithMinCapacity(size_t a_row) const;
