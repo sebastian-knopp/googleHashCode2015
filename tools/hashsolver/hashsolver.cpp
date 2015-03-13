@@ -89,7 +89,7 @@ int main (int , char *[])
             placeServer(serverIndex);
         }
 
-        return simulatedAnnealing(rndGenerator, s, 5.0, 0.999995, 50000000, true);
+        return simulatedAnnealing(rndGenerator, s, 5.0, 0.999995, 50000000, false);
 //        return simulatedAnnealing(rndGenerator, s, 5.0, 0.99, 1000, false);
     };
 
@@ -106,12 +106,13 @@ int main (int , char *[])
     for (auto& f : futures)
     {
         Solution s = f.get();
+        std::cout << "*";
         size_t rating = s.getRating();
         if (rating > bestRating)
         {
             bestSolution = s;
             bestRating = rating;
-            std::cout << "[initial] new best rating : "<< bestRating << std::endl;
+            std::cout << std::endl << "new best rating : "<< bestRating << std::endl;
         }
     }
 
