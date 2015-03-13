@@ -172,9 +172,8 @@ Solution simulatedAnnealing(std::mt19937& rndGenerator,
 
         if (p > e)
         {
-            s.m_servers[randomIndex1].m_poolIndex = oldPoolIndex;
-            s.m_assignedCapacity(s.m_servers[randomIndex1].m_coord.m_row, oldPoolIndex) += s.m_request->m_servers[randomIndex1].m_capacity;
-            s.m_assignedCapacity(s.m_servers[randomIndex1].m_coord.m_row, newPoolIndex) -= s.m_request->m_servers[randomIndex1].m_capacity;
+            s.removeServer(randomIndex1);
+            s.placeServer(old.m_coord, randomIndex1, oldPoolIndex);
         }
         else
         {
