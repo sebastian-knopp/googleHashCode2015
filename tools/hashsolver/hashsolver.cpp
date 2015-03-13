@@ -136,9 +136,11 @@ int main (int , char *[])
 
     //s.m_servers
 
-    bestSolution = simulatedAnnealing(rndGenerator, bestSolution, 100.0, 0.99999, 10000000, true);
+    bestSolution = simulatedAnnealing(rndGenerator, bestSolution, 100.0, 0.99999, 1000000, true);
 
     std::cout << "best rating : " << bestSolution.getRating() << std::endl;
+
+    s.printSolution();
 
     //for ();
 

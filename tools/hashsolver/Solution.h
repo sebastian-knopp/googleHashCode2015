@@ -44,6 +44,8 @@ public:
 
     void printServerInfo(size_t serverIndex);
 
+    void printSolution() const;
+
 
 public:
 

@@ -190,6 +190,35 @@ void Solution::printServerInfo(size_t serverIndex)
 }
 
 
+void Solution::printSolution() const
+{
+    base::Vector2d<size_t> draw = m_isAssigned;
+
+    for (size_t s = 0; s != m_servers.size(); ++s)
+    {
+        for (size_t i = 0; i < m_request->m_servers[s].m_size; ++i)
+        {
+            draw(m_servers[s].m_coord.m_row, m_servers[s].m_coord.m_slot + i) = 2;
+        }
+    }
+
+    for (size_t row = 0; row != getNmbRows(); ++row)
+    {
+        for (size_t slot = 0; slot != m_request->m_nmbSlots; ++slot)
+        {
+            if (draw(row, slot) == 0)
+                std::cout << "O";
+            else if (draw(row, slot) == 1)
+                std::cout << "x";
+            else if (draw(row, slot) == 2)
+                std::cout << "s";
+        }
+        std::cout << "\n";
+    }
+    std::cout << std::flush;
+}
+
+
 std::ostream& operator<<(std::ostream& is, const Solution& a_solution)
 {
     for (size_t i = 0; i != a_solution.m_servers.size(); ++i)
