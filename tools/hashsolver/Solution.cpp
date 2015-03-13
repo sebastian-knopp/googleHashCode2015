@@ -59,10 +59,16 @@ bool Solution::isPlacable(const Coordinate& a_coord, size_t a_serverIndex) const
 
 void Solution::placeServer(const Coordinate& a_coord, size_t a_serverIndex, size_t a_poolIndex)
 {
+    if (a_poolIndex == std::numeric_limits<size_t>::max())
+        return;
+
     for (size_t i = 0; i < m_request->m_servers[a_serverIndex].m_size; ++i)
     {
         if (m_isAssigned(a_coord.m_row, a_coord.m_slot + i) == 1)
+        {
+            std::cerr << "invalid placement" << std::endl;
             throw "error";
+        }
         m_isAssigned(a_coord.m_row, a_coord.m_slot + i) = 1;
     }
     m_servers[a_serverIndex].m_coord = a_coord;
@@ -74,6 +80,10 @@ void Solution::placeServer(const Coordinate& a_coord, size_t a_serverIndex, size
 void Solution::removeServer(size_t a_serverIndex)
 {
     const PlacedServer& server = m_servers[a_serverIndex];
+
+    if (server.m_poolIndex == std::numeric_limits<size_t>::max())
+        return;
+
     m_assignedCapacity(server.m_coord.m_row, server.m_poolIndex) -= m_request->m_servers[a_serverIndex].m_capacity;
 
     for (size_t i = 0; i < m_request->m_servers[a_serverIndex].m_size; ++i)
@@ -131,7 +141,15 @@ std::ostream& operator<<(std::ostream& is, const Solution& a_solution)
     return is;
 }
 
+/*
+class Move
+{
+    Move(size_t );
 
+public:
+
+};
+*/
 
 Solution simulatedAnnealing(std::mt19937& rndGenerator,
                             const Solution& a_solution, double initialTemperature, double coolingFactor, size_t runs, bool print)
@@ -155,42 +173,104 @@ Solution simulatedAnnealing(std::mt19937& rndGenerator,
     double currentTemperature = initialTemperature;
     for (size_t i = 0; i != runs; ++i)
     {
-        size_t randomIndex1 = placedServerIndices[intDistribution(rndGenerator) % placedServerIndices.size()];
-
-        PlacedServer old = s.m_servers[randomIndex1];
-        size_t oldPoolIndex = s.m_servers[randomIndex1].m_poolIndex;
-        size_t newPoolIndex = intDistribution(rndGenerator) % s.getNmbPools();
-
-        s.removeServer(randomIndex1);
-        s.placeServer(old.m_coord, randomIndex1, newPoolIndex);
-
-        double currentRating = static_cast<double>(s.getRating());
-
-        const double diff = previousRating - currentRating;
-        const double p = realDistribution(rndGenerator);
-        const double e = std::exp(-diff / currentTemperature);
-
-        if (p > e)
+        size_t moveType = intDistribution(rndGenerator) % 2;
+        if (moveType == 1)
         {
+            size_t randomIndex1 = placedServerIndices[intDistribution(rndGenerator) % placedServerIndices.size()];
+
+            PlacedServer old = s.m_servers[randomIndex1];
+            size_t oldPoolIndex = s.m_servers[randomIndex1].m_poolIndex;
+            size_t newPoolIndex = intDistribution(rndGenerator) % s.getNmbPools();
+
             s.removeServer(randomIndex1);
-            s.placeServer(old.m_coord, randomIndex1, oldPoolIndex);
+            s.placeServer(old.m_coord, randomIndex1, newPoolIndex);
+
+            double currentRating = static_cast<double>(s.getRating());
+
+            const double diff = previousRating - currentRating;
+            const double p = realDistribution(rndGenerator);
+            const double e = std::exp(-diff / currentTemperature);
+
+            if (p > e)
+            {
+                s.removeServer(randomIndex1);
+                s.placeServer(old.m_coord, randomIndex1, oldPoolIndex);
+            }
+            else
+            {
+                previousRating = currentRating;
+            }
+
+            if (previousRating > bestRating)
+            {
+                bestSolution = s;
+                bestRating = previousRating;
+                if (print)
+                {
+                    std::cout << "new best rating : "<< bestRating << std::endl;
+                    std::cout << "i: "<< i << std::endl;
+                }
+            }
         }
         else
         {
-            previousRating = currentRating;
-        }
+            size_t randomIndex1 = placedServerIndices[intDistribution(rndGenerator) % placedServerIndices.size()];
+            size_t randomIndex2 = placedServerIndices[intDistribution(rndGenerator) % placedServerIndices.size()];
 
-        if (previousRating > bestRating)
-        {
-            bestSolution = s;
-            bestRating = previousRating;
-            if (print)
+            if (randomIndex1 == randomIndex2)
             {
-                std::cout << "new best rating : "<< bestRating << std::endl;
-                std::cout << "i: "<< i << std::endl;
+                randomIndex2 = (randomIndex2 + 1) % s.m_servers.size();
+            }
+
+            PlacedServer old1 = s.m_servers[randomIndex1];
+            PlacedServer old2 = s.m_servers[randomIndex2];
+
+            s.removeServer(randomIndex1);
+            s.removeServer(randomIndex2);
+/*
+            if (s.isPlacable(old2.m_coord, randomIndex1))
+                s.placeServer(old2.m_coord, randomIndex1, old1.m_poolIndex);
+
+            if (s.isPlacable(old1.m_coord, randomIndex2))
+                s.placeServer(old1.m_coord, randomIndex2, old1.m_poolIndex);
+
+
+                    ||
+                !s.isPlacable(old1.m_coord, randomIndex2))
+            {
+                s.placeServer(old1.m_coord, randomIndex1, old1.m_poolIndex);
+                s.placeServer(old2.m_coord, randomIndex2, old2.m_poolIndex);
+                continue;
+            }
+*/
+            s.placeServer(old2.m_coord, randomIndex2, old2.m_poolIndex);
+            s.placeServer(old1.m_coord, randomIndex1, old1.m_poolIndex);
+
+            double currentRating = static_cast<double>(s.getRating());
+
+            const double diff = previousRating - currentRating;
+            const double p = realDistribution(rndGenerator);
+            const double e = std::exp(-diff / currentTemperature);
+
+            if (p > e)
+            {
+            }
+            else
+            {
+                previousRating = currentRating;
+            }
+
+            if (previousRating > bestRating)
+            {
+                bestSolution = s;
+                bestRating = previousRating;
+                if (print)
+                {
+                    std::cout << "new best rating : "<< bestRating << std::endl;
+                    std::cout << "i: "<< i << std::endl;
+                }
             }
         }
-
         currentTemperature *= coolingFactor;
     }
     return bestSolution;
