@@ -95,11 +95,11 @@ int main (int , char *[])
         isAssigned(c.m_row, c.m_slot) = 1;
     }
 
-    auto isAvailable = [&] (size_t row, size_t slot, size_t size)
+    auto isAvailable = [&] (const Coordinate& a_coord, size_t size)
     {
         for (size_t i = 0; i < size; ++i)
         {
-            if (isAssigned(row, slot + i) == 1)
+            if (isAssigned(a_coord.m_row, a_coord.m_slot + i) == 1)
                 return false;
         }
         return true;
@@ -117,25 +117,25 @@ int main (int , char *[])
 
     auto placeServer = [&] (size_t serverIndex) {
         const Server& server = r.m_servers[serverIndex];
-        size_t currentRow = 0;
-        while (currentRow < r.m_nmbRows)
+        Coordinate currentCoord;
+        while (currentCoord.m_row < r.m_nmbRows)
         {
-            size_t currentSlot = 0;
-            while (currentSlot < r.m_nmbSlots - server.m_size)
+            currentCoord.m_slot = 0;
+            while (currentCoord.m_slot < r.m_nmbSlots - server.m_size)
             {
-                if (isAvailable(currentRow, currentSlot, server.m_size))
+                if (isAvailable(currentCoord, server.m_size))
                 {
-                    place(currentRow, currentSlot, server.m_size);
-                    size_t currentPool = getPoolWithMinCapacity(currentRow);
-                    s.m_servers[serverIndex].m_coord.m_row = currentRow;
-                    s.m_servers[serverIndex].m_coord.m_slot = currentSlot;
+                    place(currentCoord.m_row, currentCoord.m_slot, server.m_size);
+                    size_t currentPool = getPoolWithMinCapacity(currentCoord.m_row);
+                    s.m_servers[serverIndex].m_coord.m_row = currentCoord.m_row;
+                    s.m_servers[serverIndex].m_coord.m_slot = currentCoord.m_slot;
                     s.m_servers[serverIndex].m_poolIndex = currentPool;
-                    s.m_assignedCapacity(currentRow, currentPool) += server.m_capacity;
+                    s.m_assignedCapacity(currentCoord.m_row, currentPool) += server.m_capacity;
                     return;
                 }
-                ++currentSlot;
+                ++currentCoord.m_slot;
             }
-            ++currentRow;
+            ++currentCoord.m_row;
         }
     };
 
