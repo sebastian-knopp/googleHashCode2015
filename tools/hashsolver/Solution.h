@@ -3,16 +3,14 @@
 #include "PlacedServer.h"
 #include "base/Vector2d.h"
 
+class Request;
+
 
 class Solution {
 
 public:
 
-    Solution(size_t a_nmbRows, size_t a_nmbPools, size_t a_nmbSlots)
-    : m_assignedCapacity(a_nmbRows, a_nmbPools, 0)
-    , m_isAssigned(a_nmbRows, a_nmbSlots, 0)
-    {
-    }
+    explicit Solution(const Request& a_request);
 
     size_t getRating() const;
 

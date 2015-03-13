@@ -49,7 +49,7 @@ int main (int , char *[])
        return r.m_servers[lhs].getRatio() > r.m_servers[rhs].getRatio();
     });
 
-    Solution s(r.m_nmbRows, r.m_nmbPools, r.m_nmbSlots);
+    Solution s(r);
     s.m_servers.resize(r.m_servers.size());
 
 
