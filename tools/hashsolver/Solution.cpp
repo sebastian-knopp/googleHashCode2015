@@ -1,7 +1,6 @@
 #include "Solution.h"
 #include "Request.h"
 #include <iostream>
-#include <random>
 
 
 Solution::Solution(const Request& a_request)
@@ -112,9 +111,9 @@ std::ostream& operator<<(std::ostream& is, const Solution& a_solution)
 
 
 
-Solution simulatedAnnealing(const Solution& a_solution, double initialTemperature, double coolingFactor, size_t runs, bool print)
+Solution simulatedAnnealing(std::mt19937& rndGenerator,
+                            const Solution& a_solution, double initialTemperature, double coolingFactor, size_t runs, bool print)
 {
-    std::mt19937 rndGenerator;
     std::uniform_int_distribution<> intDistribution(0, std::numeric_limits<int>::max());
     std::uniform_real_distribution<> realDistribution(0, 1.0);
 

@@ -38,15 +38,6 @@ int main (int , char *[])
     std::cout << "u = " << r.m_unavailableSlots.size() << std::endl;
 */
 
-    std::vector<size_t> serverPermutation;
-    serverPermutation.reserve(r.m_servers.size());
-    for (size_t i = 0; i != r.m_servers.size(); ++i)
-    {
-        serverPermutation.push_back(i);
-    }
-    std::sort(begin(serverPermutation), end(serverPermutation), [&r] (size_t lhs, size_t rhs){
-       return r.m_servers[lhs].getRatio() > r.m_servers[rhs].getRatio();
-    });
 
     std::mt19937 rndGenerator;
 
@@ -56,6 +47,18 @@ int main (int , char *[])
     for (size_t i = 0; i != 2000; ++i)
     {
         Solution s(r);
+
+        std::vector<size_t> serverPermutation;
+        serverPermutation.reserve(r.m_servers.size());
+        for (size_t i = 0; i != r.m_servers.size(); ++i)
+        {
+            serverPermutation.push_back(i);
+        }
+        std::shuffle(begin(serverPermutation), end(serverPermutation), rndGenerator);
+
+        std::stable_sort(begin(serverPermutation), end(serverPermutation), [&r] (size_t lhs, size_t rhs){
+           return r.m_servers[lhs].getRatio() > r.m_servers[rhs].getRatio();
+        });
 
         std::vector<size_t> rowPermutation;
         for (size_t i = 0; i != r.m_nmbRows; ++i)
@@ -95,7 +98,7 @@ int main (int , char *[])
             placeServer(serverIndex);
         }
 
-        s = simulatedAnnealing(s, 20.0, 0.9, 1000, false);
+        s = simulatedAnnealing(rndGenerator, s, 20.0, 0.9, 200, false);
 
         size_t rating = s.getRating();
         if (rating > bestRating)
@@ -138,7 +141,7 @@ int main (int , char *[])
 
     //s.m_servers
 
-    bestSolution = simulatedAnnealing(bestSolution, 50.0, 0.9999, 10000000, true);
+    bestSolution = simulatedAnnealing(rndGenerator, bestSolution, 50.0, 0.9999, 10000000, true);
     //for ();
 
     std::ofstream ofs("D:\\googleHash\\out.txt");

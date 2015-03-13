@@ -2,6 +2,8 @@
 
 #include "PlacedServer.h"
 #include "base/Vector2d.h"
+#include <random>
+
 
 class Request;
 
@@ -48,7 +50,8 @@ public:
 };
 
 
-Solution simulatedAnnealing(const Solution& a_solution,
+Solution simulatedAnnealing(std::mt19937& rndGenerator,
+                            const Solution& a_solution,
                             double initialTemperature,
                             double coolingFactor,
                             size_t runs,
