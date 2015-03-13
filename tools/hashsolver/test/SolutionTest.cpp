@@ -4,8 +4,6 @@
 
 TEST(SolutionTest, empty)
 {
-    Solution();
-
     EXPECT_TRUE(true);
 }
 

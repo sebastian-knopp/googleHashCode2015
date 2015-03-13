@@ -1,20 +1,24 @@
 #pragma once
 
 #include "PlacedServer.h"
-#include <vector>
+#include "base/Vector2d.h"
 
 
 class Solution {
 
 public:
 
-    Solution()
+    Solution(size_t a_nmbRows, size_t a_nmbPools)
+    : m_assignedCapacity(a_nmbRows, a_nmbPools, 0)
     {
     }
+
 
 public:
 
     PlacedServers m_servers;
+
+    base::Vector2d<size_t> m_assignedCapacity;
 
 };
 

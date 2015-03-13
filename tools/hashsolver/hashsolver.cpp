@@ -48,6 +48,10 @@ int main (int , char *[])
     std::sort(begin(serverPermutation), end(serverPermutation), [&r] (size_t lhs, size_t rhs){
        return r.m_servers[lhs].getRatio() > r.m_servers[rhs].getRatio();
     });
+
+    Solution s(r.m_nmbRows, r.m_nmbPools);
+    s.m_servers.resize(r.m_servers.size());
+
 /*
     for (size_t serverIndex : serverPermutation)
     {
@@ -56,15 +60,14 @@ int main (int , char *[])
 */
 
     // capacity of a pool in a row
-    base::Vector2d<size_t> assignedCapacity(r.m_nmbRows, r.m_nmbPools, 0);
 
     auto getPoolCapacity = [&] (size_t a_pool)
     {
-        size_t nmbRows = assignedCapacity.width();
+        size_t nmbRows = s.m_assignedCapacity.width();
         size_t c = 0;
         for (size_t i = 0; i < nmbRows; ++i)
         {
-            c += assignedCapacity(i, a_pool);
+            c += s.m_assignedCapacity(i, a_pool);
         }
         return c;
     };
@@ -73,10 +76,10 @@ int main (int , char *[])
     {
         size_t bestPool = 0;
         size_t min = std::numeric_limits<size_t>::max();
-        size_t nmbPools = assignedCapacity.height();
+        size_t nmbPools = s.m_assignedCapacity.height();
         for (size_t i = 0; i < nmbPools; ++i)
         {
-            size_t poolCap = getPoolCapacity(i) + assignedCapacity(a_row, i);
+            size_t poolCap = getPoolCapacity(i) + s.m_assignedCapacity(a_row, i);
             if (poolCap < min)
             {
                 min = poolCap;
@@ -112,9 +115,6 @@ int main (int , char *[])
         }
     };
 
-    Solution s;
-    s.m_servers.resize(r.m_servers.size());
-
     auto placeServer = [&] (size_t serverIndex) {
         const Server& server = r.m_servers[serverIndex];
         size_t currentRow = 0;
@@ -130,7 +130,7 @@ int main (int , char *[])
                     s.m_servers[serverIndex].m_coord.m_row = currentRow;
                     s.m_servers[serverIndex].m_coord.m_slot = currentSlot;
                     s.m_servers[serverIndex].m_poolIndex = currentPool;
-                    assignedCapacity(currentRow, currentPool) += server.m_capacity;
+                    s.m_assignedCapacity(currentRow, currentPool) += server.m_capacity;
                     return;
                 }
                 ++currentSlot;
@@ -152,13 +152,13 @@ int main (int , char *[])
             size_t poolCapacity = 0;
             for (size_t rowIndex = 0; rowIndex != r.m_nmbRows; ++rowIndex)
             {
-                poolCapacity += assignedCapacity(rowIndex, poolIndex);
+                poolCapacity += s.m_assignedCapacity(rowIndex, poolIndex);
             }
 
             size_t poolMin = std::numeric_limits<size_t>::max();
             for (size_t rowIndex = 0; rowIndex != r.m_nmbRows; ++rowIndex)
             {
-                size_t currentMin = poolCapacity - assignedCapacity(rowIndex, poolIndex);
+                size_t currentMin = poolCapacity - s.m_assignedCapacity(rowIndex, poolIndex);
                 if (currentMin < poolMin)
                     poolMin = currentMin;
             }
@@ -210,7 +210,7 @@ int main (int , char *[])
     };
 */
     double currentTemperature = 50.0;
-    for (size_t i = 0; i != 10000000; ++i)
+    for (size_t i = 0; i != 1000000; ++i)
     {
         size_t randomIndex1 = placedServerIndices[intDistribution(rndGenerator) % placedServerIndices.size()];
         {
@@ -218,8 +218,8 @@ int main (int , char *[])
             size_t newPoolIndex = intDistribution(rndGenerator) % r.m_nmbPools;
 
             s.m_servers[randomIndex1].m_poolIndex = newPoolIndex;
-            assignedCapacity(s.m_servers[randomIndex1].m_coord.m_row, oldPoolIndex) -= r.m_servers[randomIndex1].m_capacity;
-            assignedCapacity(s.m_servers[randomIndex1].m_coord.m_row, newPoolIndex) += r.m_servers[randomIndex1].m_capacity;
+            s.m_assignedCapacity(s.m_servers[randomIndex1].m_coord.m_row, oldPoolIndex) -= r.m_servers[randomIndex1].m_capacity;
+            s.m_assignedCapacity(s.m_servers[randomIndex1].m_coord.m_row, newPoolIndex) += r.m_servers[randomIndex1].m_capacity;
 
             double currentRating = static_cast<double>(getRating());
 
@@ -230,8 +230,8 @@ int main (int , char *[])
             if (p > e)
             {
                 s.m_servers[randomIndex1].m_poolIndex = oldPoolIndex;
-                assignedCapacity(s.m_servers[randomIndex1].m_coord.m_row, oldPoolIndex) += r.m_servers[randomIndex1].m_capacity;
-                assignedCapacity(s.m_servers[randomIndex1].m_coord.m_row, newPoolIndex) -= r.m_servers[randomIndex1].m_capacity;
+                s.m_assignedCapacity(s.m_servers[randomIndex1].m_coord.m_row, oldPoolIndex) += r.m_servers[randomIndex1].m_capacity;
+                s.m_assignedCapacity(s.m_servers[randomIndex1].m_coord.m_row, newPoolIndex) -= r.m_servers[randomIndex1].m_capacity;
             }
             else
             {
