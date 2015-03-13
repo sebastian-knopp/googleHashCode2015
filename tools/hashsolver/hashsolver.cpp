@@ -39,13 +39,10 @@ int main (int , char *[])
 */
 
 
-    std::mt19937 rndGenerator;
 
-    Solution bestSolution(r);
-    size_t bestRating = bestSolution.getRating();
+    auto startHeuristic = [r] (int seed) {
 
-    for (size_t i = 0; i != 100; ++i)
-    {
+        std::mt19937 rndGenerator(seed);
         Solution s(r);
 
         std::vector<size_t> serverPermutation;
@@ -93,8 +90,15 @@ int main (int , char *[])
             placeServer(serverIndex);
         }
 
-        s = simulatedAnnealing(rndGenerator, s, 5.0, 0.99, 1000, false);
+        return simulatedAnnealing(rndGenerator, s, 5.0, 0.99, 1000, false);
+    };
 
+
+    Solution bestSolution(r);
+    size_t bestRating = bestSolution.getRating();
+    for (size_t i = 0; i != 100; ++i)
+    {
+        Solution s = startHeuristic(i);
         size_t rating = s.getRating();
         if (rating > bestRating)
         {
@@ -102,7 +106,6 @@ int main (int , char *[])
             bestRating = rating;
             std::cout << "[initial] new best rating : "<< bestRating << std::endl;
         }
-
     }
 
     Solution s = bestSolution;
@@ -110,6 +113,7 @@ int main (int , char *[])
     std::cout << "initial rating : " << bestRating << std::endl;
 
 
+    std::mt19937 rndGenerator;
     bestSolution = simulatedAnnealing(rndGenerator, bestSolution, 5.0, 0.999995, 50000000, true);
 
     std::cout << "best rating : " << bestSolution.getRating() << std::endl;
