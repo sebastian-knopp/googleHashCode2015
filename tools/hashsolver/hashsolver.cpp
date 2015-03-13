@@ -89,13 +89,13 @@ int main (int , char *[])
             placeServer(serverIndex);
         }
 
-        return simulatedAnnealing(rndGenerator, s, 5.0, 0.999995, 50000000, false);
+        return simulatedAnnealing(rndGenerator, s, 5.0, 0.999995, 10000000, false);
 //        return simulatedAnnealing(rndGenerator, s, 5.0, 0.99, 1000, false);
     };
 
 
     std::vector<std::future<Solution>> futures;
-    for (size_t i = 0; i != 100; ++i)
+    for (size_t i = 0; i != 4; ++i)
     {
         std::cout << "f " << i << std::endl;
         futures.emplace_back(std::async(std::launch::async, startHeuristic, i));
@@ -106,20 +106,18 @@ int main (int , char *[])
     for (auto& f : futures)
     {
         Solution s = f.get();
-        std::cout << "*";
         size_t rating = s.getRating();
+        std::cout << "r = " << rating << std::endl;
         if (rating > bestRating)
         {
             bestSolution = s;
             bestRating = rating;
-            std::cout << std::endl << "new best rating : "<< bestRating << std::endl;
+            std::cout << "new best rating : "<< bestRating << std::endl;
         }
     }
 
-    Solution s = bestSolution;
-
-    std::cout << "initial rating : " << bestRating << std::endl;
-    std::mt19937 rndGenerator;
+    std::cout << "final rating : " << bestSolution.getRating() << std::endl;
+//    std::mt19937 rndGenerator;
 
 //    s = simulatedAnnealing(rndGenerator, s, 5.0, 0.999995, 50000000, true);
     /*
@@ -131,7 +129,7 @@ int main (int , char *[])
 
 
     std::ofstream ofs("D:\\googleHash\\out.txt");
-    ofs << s;
+    ofs << bestSolution;
 }
 
 
