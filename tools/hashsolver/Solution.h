@@ -26,6 +26,10 @@ public:
         return m_assignedCapacity.height();
     }
 
+    size_t getPoolCapacity(size_t a_pool) const;
+
+    size_t getPoolWithMinCapacity(size_t a_row) const;
+
 public:
 
     PlacedServers m_servers;

@@ -57,3 +57,33 @@ size_t Solution::getRating() const
     }
     return overallMin;
 }
+
+
+size_t Solution::getPoolCapacity(size_t a_pool) const
+{
+    size_t nmbRows = m_assignedCapacity.width();
+    size_t c = 0;
+    for (size_t i = 0; i < nmbRows; ++i)
+    {
+        c += m_assignedCapacity(i, a_pool);
+    }
+    return c;
+}
+
+
+size_t Solution::getPoolWithMinCapacity(size_t a_row) const
+{
+    size_t bestPool = 0;
+    size_t min = std::numeric_limits<size_t>::max();
+    size_t nmbPools = m_assignedCapacity.height();
+    for (size_t i = 0; i < nmbPools; ++i)
+    {
+        size_t poolCap = getPoolCapacity(i) + m_assignedCapacity(a_row, i);
+        if (poolCap < min)
+        {
+            min = poolCap;
+            bestPool = i;
+        }
+    }
+    return bestPool;
+}

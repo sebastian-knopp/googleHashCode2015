@@ -61,33 +61,7 @@ int main (int , char *[])
 
     // capacity of a pool in a row
 
-    auto getPoolCapacity = [&] (size_t a_pool)
-    {
-        size_t nmbRows = s.m_assignedCapacity.width();
-        size_t c = 0;
-        for (size_t i = 0; i < nmbRows; ++i)
-        {
-            c += s.m_assignedCapacity(i, a_pool);
-        }
-        return c;
-    };
 
-    auto getPoolWithMinCapacity = [&] (size_t a_row)
-    {
-        size_t bestPool = 0;
-        size_t min = std::numeric_limits<size_t>::max();
-        size_t nmbPools = s.m_assignedCapacity.height();
-        for (size_t i = 0; i < nmbPools; ++i)
-        {
-            size_t poolCap = getPoolCapacity(i) + s.m_assignedCapacity(a_row, i);
-            if (poolCap < min)
-            {
-                min = poolCap;
-                bestPool = i;
-            }
-        }
-        return bestPool;
-    };
 
     for (const Coordinate& c : r.m_unavailableSlots)
     {
@@ -125,7 +99,7 @@ int main (int , char *[])
                 if (isAvailable(currentCoord, server.m_size))
                 {
                     place(currentCoord.m_row, currentCoord.m_slot, server.m_size);
-                    size_t currentPool = getPoolWithMinCapacity(currentCoord.m_row);
+                    size_t currentPool = s.getPoolWithMinCapacity(currentCoord.m_row);
                     s.m_servers[serverIndex].m_coord.m_row = currentCoord.m_row;
                     s.m_servers[serverIndex].m_coord.m_slot = currentCoord.m_slot;
                     s.m_servers[serverIndex].m_poolIndex = currentPool;
