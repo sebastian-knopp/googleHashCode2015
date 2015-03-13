@@ -35,6 +35,8 @@ public:
 
 public:
 
+    const Request* m_request;
+
     PlacedServers m_servers;
 
     //! capacity of a pool in a row
@@ -44,6 +46,13 @@ public:
 
 
 };
+
+
+Solution simulatedAnnealing(const Solution& a_solution,
+                            double initialTemperature,
+                            double coolingFactor,
+                            size_t runs,
+                            bool print);
 
 
 //size_t getRating(const Request a_request, const Solution& a_solution);

@@ -1,10 +1,12 @@
 #include "Solution.h"
 #include "Request.h"
 #include <iostream>
+#include <random>
 
 
 Solution::Solution(const Request& a_request)
-: m_servers(a_request.m_servers.size())
+: m_request(&a_request)
+, m_servers(a_request.m_servers.size())
 , m_assignedCapacity(a_request.m_nmbRows, a_request.m_nmbPools, 0)
 , m_isAssigned(a_request.m_nmbRows, a_request.m_nmbSlots, 0)
 {
@@ -17,6 +19,10 @@ Solution::Solution(const Request& a_request)
 
 size_t Solution::getRating() const
 {
+    std::mt19937 rndGenerator;
+    std::uniform_int_distribution<> intDistribution(0, std::numeric_limits<int>::max());
+    std::uniform_real_distribution<> realDistribution(0, 1.0);
+
     size_t overallMin = std::numeric_limits<size_t>::max();
     for (size_t poolIndex = 0; poolIndex != getNmbPools(); ++poolIndex)
     {
@@ -104,3 +110,69 @@ std::ostream& operator<<(std::ostream& is, const Solution& a_solution)
     return is;
 }
 
+
+
+Solution simulatedAnnealing(const Solution& a_solution, double initialTemperature, double coolingFactor, size_t runs, bool print)
+{
+    std::mt19937 rndGenerator;
+    std::uniform_int_distribution<> intDistribution(0, std::numeric_limits<int>::max());
+    std::uniform_real_distribution<> realDistribution(0, 1.0);
+
+    Solution s = a_solution;
+    Solution bestSolution = a_solution;
+    size_t bestRating = bestSolution.getRating();
+
+
+    std::vector<size_t> placedServerIndices;
+    for (size_t i = 0; i != a_solution.m_servers.size(); ++i)
+    {
+        if (s.m_servers[i].isPlaced())
+            placedServerIndices.push_back(i);
+    }
+
+    double previousRating = static_cast<double>(bestRating);
+    double currentTemperature = initialTemperature;
+    for (size_t i = 0; i != runs; ++i)
+    {
+        size_t randomIndex1 = placedServerIndices[intDistribution(rndGenerator) % placedServerIndices.size()];
+        {
+            size_t oldPoolIndex = s.m_servers[randomIndex1].m_poolIndex;
+            size_t newPoolIndex = intDistribution(rndGenerator) % s.getNmbPools();
+
+            s.m_servers[randomIndex1].m_poolIndex = newPoolIndex;
+            s.m_assignedCapacity(s.m_servers[randomIndex1].m_coord.m_row, oldPoolIndex) -= s.m_request->m_servers[randomIndex1].m_capacity;
+            s.m_assignedCapacity(s.m_servers[randomIndex1].m_coord.m_row, newPoolIndex) += s.m_request->m_servers[randomIndex1].m_capacity;
+
+            double currentRating = static_cast<double>(s.getRating());
+
+            const double diff = previousRating - currentRating;
+            const double p = realDistribution(rndGenerator);
+            const double e = std::exp(-diff / currentTemperature);
+
+            if (p > e)
+            {
+                s.m_servers[randomIndex1].m_poolIndex = oldPoolIndex;
+                s.m_assignedCapacity(s.m_servers[randomIndex1].m_coord.m_row, oldPoolIndex) += s.m_request->m_servers[randomIndex1].m_capacity;
+                s.m_assignedCapacity(s.m_servers[randomIndex1].m_coord.m_row, newPoolIndex) -= s.m_request->m_servers[randomIndex1].m_capacity;
+            }
+            else
+            {
+                previousRating = currentRating;
+            }
+        }
+
+        if (previousRating > bestRating)
+        {
+            bestSolution = s;
+            bestRating = previousRating;
+            if (print)
+            {
+                std::cout << "new best rating : "<< bestRating << std::endl;
+                std::cout << "i: "<< i << std::endl;
+            }
+        }
+
+        currentTemperature *= coolingFactor;
+    }
+    return bestSolution;
+}

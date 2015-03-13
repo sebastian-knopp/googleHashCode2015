@@ -49,13 +49,11 @@ int main (int , char *[])
     });
 
     std::mt19937 rndGenerator;
-    std::uniform_int_distribution<> intDistribution(0, std::numeric_limits<int>::max());
-    std::uniform_real_distribution<> realDistribution(0, 1.0);
 
     Solution bestSolution(r);
     size_t bestRating = bestSolution.getRating();
 
-    for (size_t i = 0; i != 1000; ++i)
+    for (size_t i = 0; i != 2000; ++i)
     {
         Solution s(r);
 
@@ -97,6 +95,8 @@ int main (int , char *[])
             placeServer(serverIndex);
         }
 
+        s = simulatedAnnealing(s, 20.0, 0.9, 1000, false);
+
         size_t rating = s.getRating();
         if (rating > bestRating)
         {
@@ -109,14 +109,6 @@ int main (int , char *[])
 
     Solution s = bestSolution;
 
-    std::vector<size_t> placedServerIndices;
-    for (size_t i = 0; i != r.m_servers.size(); ++i)
-    {
-        if (s.m_servers[i].isPlaced())
-            placedServerIndices.push_back(i);
-    }
-
-    double previousRating = static_cast<double>(bestRating);
     std::cout << "initial rating : " << bestRating << std::endl;
 
 /*
@@ -143,50 +135,10 @@ int main (int , char *[])
                r.m_servers[server2].m_size <= trueServerSize[server1];
     };
 */
-    double currentTemperature = 50.0;
-    for (size_t i = 0; i != 2000000; ++i)
-    {
-        size_t randomIndex1 = placedServerIndices[intDistribution(rndGenerator) % placedServerIndices.size()];
-        {
-            size_t oldPoolIndex = s.m_servers[randomIndex1].m_poolIndex;
-            size_t newPoolIndex = intDistribution(rndGenerator) % r.m_nmbPools;
-
-            s.m_servers[randomIndex1].m_poolIndex = newPoolIndex;
-            s.m_assignedCapacity(s.m_servers[randomIndex1].m_coord.m_row, oldPoolIndex) -= r.m_servers[randomIndex1].m_capacity;
-            s.m_assignedCapacity(s.m_servers[randomIndex1].m_coord.m_row, newPoolIndex) += r.m_servers[randomIndex1].m_capacity;
-
-            double currentRating = static_cast<double>(s.getRating());
-
-            const double diff = previousRating - currentRating;
-            const double p = realDistribution(rndGenerator);
-            const double e = std::exp(-diff / currentTemperature);
-
-            if (p > e)
-            {
-                s.m_servers[randomIndex1].m_poolIndex = oldPoolIndex;
-                s.m_assignedCapacity(s.m_servers[randomIndex1].m_coord.m_row, oldPoolIndex) += r.m_servers[randomIndex1].m_capacity;
-                s.m_assignedCapacity(s.m_servers[randomIndex1].m_coord.m_row, newPoolIndex) -= r.m_servers[randomIndex1].m_capacity;
-            }
-            else
-            {
-                previousRating = currentRating;
-            }
-        }
-
-        if (previousRating > bestRating)
-        {
-            bestSolution = s;
-            bestRating = previousRating;
-            std::cout << "new best rating : "<< bestRating << std::endl;
-            std::cout << "i: "<< i << std::endl;
-        }
-
-        currentTemperature *= 0.9999;
-    }
 
     //s.m_servers
 
-
+    bestSolution = simulatedAnnealing(bestSolution, 50.0, 0.9999, 10000000, true);
     //for ();
 
     std::ofstream ofs("D:\\googleHash\\out.txt");
