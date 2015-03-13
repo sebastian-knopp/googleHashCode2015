@@ -317,7 +317,7 @@ Solution simulatedAnnealing(std::mt19937& rndGenerator,
             s.swapServers(randomIndex1, randomIndex2);
             s.alignLeft(randomIndex1);
             s.alignLeft(randomIndex2);
-
+/*
             if (!s.canSwapServers(randomIndex2, randomIndex1))
             {
                 s.printServerInfo(randomIndex1);
@@ -325,7 +325,7 @@ Solution simulatedAnnealing(std::mt19937& rndGenerator,
                 std::cout << "huh?" << std::endl;
                 throw "hu";
             }
-
+*/
             double currentRating = static_cast<double>(s.getRating());
 
             const double diff = previousRating - currentRating;
