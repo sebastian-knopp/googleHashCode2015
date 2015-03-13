@@ -39,9 +39,10 @@ int main (int , char *[])
 
 
 
-    auto startHeuristic = [&r] (int seed) {
+    auto startHeuristic = [&r] (int a_runIndex) {
+        std::cout << "start " << a_runIndex << std::endl;
 
-        std::mt19937 rndGenerator(seed);
+        std::mt19937 rndGenerator(a_runIndex);
         Solution s(r);
 
         std::vector<size_t> serverPermutation;
@@ -89,15 +90,17 @@ int main (int , char *[])
             placeServer(serverIndex);
         }
 
-        return simulatedAnnealing(rndGenerator, s, 5.0, 0.999995, 10000000, false);
-//        return simulatedAnnealing(rndGenerator, s, 5.0, 0.99, 1000, false);
+        //        return simulatedAnnealing(rndGenerator, s, 5.0, 0.99, 1000, false);
+
+        const Solution result = simulatedAnnealing(rndGenerator, s, 20.0, 0.999995, 10000000, false);
+        std::cout << "end " << a_runIndex << " ("<< result.getRating() << ")" << std::endl;
+        return result;
     };
 
 
     std::vector<std::future<Solution>> futures;
-    for (size_t i = 0; i != 4; ++i)
+    for (size_t i = 0; i != 8; ++i)
     {
-        std::cout << "f " << i << std::endl;
         futures.emplace_back(std::async(std::launch::async, startHeuristic, i));
     }
 
@@ -107,7 +110,6 @@ int main (int , char *[])
     {
         Solution s = f.get();
         size_t rating = s.getRating();
-        std::cout << "r = " << rating << std::endl;
         if (rating > bestRating)
         {
             bestSolution = s;
