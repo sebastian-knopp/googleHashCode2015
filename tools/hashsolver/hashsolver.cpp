@@ -3,8 +3,7 @@
 #include <limits>
 #include <algorithm>
 #include <random>
-//#include <boost/random/uniform_int_distribution.hpp>
-//#include <boost/random/uniform_real_distribution.hpp>
+#include <future>
 #include "Request.h"
 #include "Solution.h"
 #include "base/Vector2d.h"
@@ -40,7 +39,7 @@ int main (int , char *[])
 
 
 
-    auto startHeuristic = [r] (int seed) {
+    auto startHeuristic = [&r] (int seed) {
 
         std::mt19937 rndGenerator(seed);
         Solution s(r);
@@ -90,15 +89,23 @@ int main (int , char *[])
             placeServer(serverIndex);
         }
 
-        return simulatedAnnealing(rndGenerator, s, 5.0, 0.99, 1000, false);
+        return simulatedAnnealing(rndGenerator, s, 5.0, 0.999995, 50000000, true);
+//        return simulatedAnnealing(rndGenerator, s, 5.0, 0.99, 1000, false);
     };
 
 
-    Solution bestSolution(r);
-    size_t bestRating = bestSolution.getRating();
+    std::vector<std::future<Solution>> futures;
     for (size_t i = 0; i != 100; ++i)
     {
-        Solution s = startHeuristic(i);
+        std::cout << "f " << i << std::endl;
+        futures.emplace_back(std::async(std::launch::async, startHeuristic, i));
+    }
+
+    Solution bestSolution(r);
+    size_t bestRating = bestSolution.getRating();
+    for (auto& f : futures)
+    {
+        Solution s = f.get();
         size_t rating = s.getRating();
         if (rating > bestRating)
         {
@@ -111,13 +118,14 @@ int main (int , char *[])
     Solution s = bestSolution;
 
     std::cout << "initial rating : " << bestRating << std::endl;
-
-
     std::mt19937 rndGenerator;
-    bestSolution = simulatedAnnealing(rndGenerator, bestSolution, 5.0, 0.999995, 50000000, true);
+
+//    s = simulatedAnnealing(rndGenerator, s, 5.0, 0.999995, 50000000, true);
+    /*
+
 
     std::cout << "best rating : " << bestSolution.getRating() << std::endl;
-
+*/
     //s.printSolution();
 
 
