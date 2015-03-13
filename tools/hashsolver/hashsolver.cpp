@@ -75,7 +75,7 @@ int main (int , char *[])
             {
                 currentCoord.m_row = rowPermutation[rowIndex];
                 currentCoord.m_slot = 0;
-                while (currentCoord.m_slot < r.m_nmbSlots - server.m_size)
+                while (currentCoord.m_slot <= r.m_nmbSlots - server.m_size)
                 {
                     if (s.isPlacable(currentCoord, serverIndex))
                     {
@@ -136,11 +136,11 @@ int main (int , char *[])
 
     //s.m_servers
 
-    bestSolution = simulatedAnnealing(rndGenerator, bestSolution, 100.0, 0.99999, 1000000, true);
+    bestSolution = simulatedAnnealing(rndGenerator, bestSolution, 25.0, 0.99, 10000000, true);
 
     std::cout << "best rating : " << bestSolution.getRating() << std::endl;
 
-    s.printSolution();
+    //s.printSolution();
 
     //for ();
 
