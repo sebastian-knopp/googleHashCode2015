@@ -227,22 +227,31 @@ Solution simulatedAnnealing(std::mt19937& rndGenerator,
 
             s.removeServer(randomIndex1);
             s.removeServer(randomIndex2);
-/*
+
             if (s.isPlacable(old2.m_coord, randomIndex1))
-                s.placeServer(old2.m_coord, randomIndex1, old1.m_poolIndex);
-
-            if (s.isPlacable(old1.m_coord, randomIndex2))
-                s.placeServer(old1.m_coord, randomIndex2, old1.m_poolIndex);
-
-
-                    ||
-                !s.isPlacable(old1.m_coord, randomIndex2))
             {
-                s.placeServer(old1.m_coord, randomIndex1, old1.m_poolIndex);
+                s.placeServer(old2.m_coord, randomIndex1, old1.m_poolIndex);
+            }
+            else
+            {
                 s.placeServer(old2.m_coord, randomIndex2, old2.m_poolIndex);
+                s.placeServer(old1.m_coord, randomIndex1, old1.m_poolIndex);
                 continue;
             }
-*/
+
+            if (s.isPlacable(old1.m_coord, randomIndex2))
+            {
+                s.placeServer(old1.m_coord, randomIndex2, old1.m_poolIndex);
+            }
+            else
+            {
+                s.removeServer(randomIndex1);
+                s.placeServer(old2.m_coord, randomIndex2, old2.m_poolIndex);
+                s.placeServer(old1.m_coord, randomIndex1, old1.m_poolIndex);
+            }
+
+            s.removeServer(randomIndex1);
+            s.removeServer(randomIndex2);
             s.placeServer(old2.m_coord, randomIndex2, old2.m_poolIndex);
             s.placeServer(old1.m_coord, randomIndex1, old1.m_poolIndex);
 
