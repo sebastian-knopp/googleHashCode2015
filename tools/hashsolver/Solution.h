@@ -13,6 +13,17 @@ public:
     {
     }
 
+    size_t getRating() const;
+
+    inline size_t getNmbRows() const
+    {
+        return m_assignedCapacity.width();
+    }
+
+    inline size_t getNmbPools() const
+    {
+        return m_assignedCapacity.height();
+    }
 
 public:
 

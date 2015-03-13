@@ -144,31 +144,6 @@ int main (int , char *[])
         placeServer(serverIndex);
     }
 
-    auto getRating = [&] ()
-    {
-        size_t overallMin = std::numeric_limits<size_t>::max();
-        for (size_t poolIndex = 0; poolIndex != r.m_nmbPools; ++poolIndex)
-        {
-            size_t poolCapacity = 0;
-            for (size_t rowIndex = 0; rowIndex != r.m_nmbRows; ++rowIndex)
-            {
-                poolCapacity += s.m_assignedCapacity(rowIndex, poolIndex);
-            }
-
-            size_t poolMin = std::numeric_limits<size_t>::max();
-            for (size_t rowIndex = 0; rowIndex != r.m_nmbRows; ++rowIndex)
-            {
-                size_t currentMin = poolCapacity - s.m_assignedCapacity(rowIndex, poolIndex);
-                if (currentMin < poolMin)
-                    poolMin = currentMin;
-            }
-
-            if (poolMin < overallMin)
-                overallMin = poolMin;
-        }
-        return overallMin;
-    };
-
     boost::mt19937 rndGenerator;
     boost::random::uniform_int_distribution<> intDistribution(0, std::numeric_limits<int>::max());
     boost::random::uniform_real_distribution<> realDistribution(0, 1.0);
@@ -181,7 +156,7 @@ int main (int , char *[])
     }
 
     Solution bestSolution = s;
-    size_t bestRating = getRating();
+    size_t bestRating = s.getRating();
     double previousRating = static_cast<double>(bestRating);
     std::cout << "initial rating : " << bestRating << std::endl;
 
@@ -221,7 +196,7 @@ int main (int , char *[])
             s.m_assignedCapacity(s.m_servers[randomIndex1].m_coord.m_row, oldPoolIndex) -= r.m_servers[randomIndex1].m_capacity;
             s.m_assignedCapacity(s.m_servers[randomIndex1].m_coord.m_row, newPoolIndex) += r.m_servers[randomIndex1].m_capacity;
 
-            double currentRating = static_cast<double>(getRating());
+            double currentRating = static_cast<double>(s.getRating());
 
             const double diff = previousRating - currentRating;
             const double p = realDistribution(rndGenerator);

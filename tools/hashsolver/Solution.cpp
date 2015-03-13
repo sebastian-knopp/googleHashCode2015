@@ -31,3 +31,29 @@ size_t getRating(const Request a_request, const Solution& a_solution)
     std::vector<size_t>;
 }
 */
+
+
+size_t Solution::getRating() const
+{
+    size_t overallMin = std::numeric_limits<size_t>::max();
+    for (size_t poolIndex = 0; poolIndex != getNmbPools(); ++poolIndex)
+    {
+        size_t poolCapacity = 0;
+        for (size_t rowIndex = 0; rowIndex != getNmbRows(); ++rowIndex)
+        {
+            poolCapacity += m_assignedCapacity(rowIndex, poolIndex);
+        }
+
+        size_t poolMin = std::numeric_limits<size_t>::max();
+        for (size_t rowIndex = 0; rowIndex != getNmbRows(); ++rowIndex)
+        {
+            size_t currentMin = poolCapacity - m_assignedCapacity(rowIndex, poolIndex);
+            if (currentMin < poolMin)
+                poolMin = currentMin;
+        }
+
+        if (poolMin < overallMin)
+            overallMin = poolMin;
+    }
+    return overallMin;
+}
