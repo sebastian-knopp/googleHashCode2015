@@ -262,8 +262,8 @@ Solution simulatedAnnealing(std::mt19937& rndGenerator,
     double currentTemperature = initialTemperature;
     for (size_t i = 0; i != runs; ++i)
     {
-        size_t moveType = intDistribution(rndGenerator) % 10;
-        if (moveType == 0)
+        size_t moveType = intDistribution(rndGenerator) % 2;
+        if (moveType < 1)
         {
             size_t randomIndex1 = placedServerIndices[intDistribution(rndGenerator) % placedServerIndices.size()];
 
@@ -315,8 +315,8 @@ Solution simulatedAnnealing(std::mt19937& rndGenerator,
                 continue;
 
             s.swapServers(randomIndex1, randomIndex2);
-            s.alignLeft(randomIndex1);
-            s.alignLeft(randomIndex2);
+//            s.alignLeft(randomIndex1);
+//            s.alignLeft(randomIndex2);
 /*
             if (!s.canSwapServers(randomIndex2, randomIndex1))
             {
