@@ -52,16 +52,6 @@ int main (int , char *[])
     Solution s(r.m_nmbRows, r.m_nmbPools, r.m_nmbSlots);
     s.m_servers.resize(r.m_servers.size());
 
-/*
-    for (size_t serverIndex : serverPermutation)
-    {
-        std::cout << r.m_servers[serverIndex] << " r=" << r.m_servers[serverIndex].getRatio() << std::endl;
-    }
-*/
-
-    // capacity of a pool in a row
-
-
 
     for (const Coordinate& c : r.m_unavailableSlots)
     {
@@ -78,13 +68,13 @@ int main (int , char *[])
         return true;
     };
 
-    auto place = [&] (size_t row, size_t slot, size_t size)
+    auto place = [&] (const Coordinate& a_coord, size_t size)
     {
         for (size_t i = 0; i < size; ++i)
         {
-            if (s.m_isAssigned(row, slot + i) == 1)
+            if (s.m_isAssigned(a_coord.m_row, a_coord.m_slot + i) == 1)
                 throw "error";
-            s.m_isAssigned(row, slot + i) = 1;
+            s.m_isAssigned(a_coord.m_row, a_coord.m_slot + i) = 1;
         }
     };
 
@@ -98,7 +88,7 @@ int main (int , char *[])
             {
                 if (isAvailable(currentCoord, server.m_size))
                 {
-                    place(currentCoord.m_row, currentCoord.m_slot, server.m_size);
+                    place(currentCoord, server.m_size);
                     size_t currentPool = s.getPoolWithMinCapacity(currentCoord.m_row);
                     s.m_servers[serverIndex].m_coord.m_row = currentCoord.m_row;
                     s.m_servers[serverIndex].m_coord.m_slot = currentCoord.m_slot;

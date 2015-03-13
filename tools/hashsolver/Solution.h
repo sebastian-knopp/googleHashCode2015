@@ -30,10 +30,12 @@ public:
 
     size_t getPoolWithMinCapacity(size_t a_row) const;
 
+
 public:
 
     PlacedServers m_servers;
 
+    //! capacity of a pool in a row
     base::Vector2d<size_t> m_assignedCapacity;
 
     base::Vector2d<size_t> m_isAssigned;
