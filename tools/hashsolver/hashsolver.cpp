@@ -97,11 +97,37 @@ int main (int , char *[])
         return result;
     };
 
+    std::atomic<size_t> currentSolutionIndex(0);
+
+    const size_t nmbCalculations = 10;
+    const size_t initialThreads = 4;
 
     std::vector<std::future<Solution>> futures;
-    for (size_t i = 0; i != 8; ++i)
+    futures.reserve(initialThreads);
+    for (size_t threadIndex = 0; threadIndex != initialThreads; ++threadIndex)
     {
-        futures.emplace_back(std::async(std::launch::async, startHeuristic, i));
+        futures.emplace_back(std::async(std::launch::async, [&r, &currentSolutionIndex, threadIndex, &startHeuristic] () {
+
+            Solution bestSolution(r);
+            size_t bestRating = bestSolution.getRating();
+
+            while (true)
+            {
+                const size_t solutionIndex = ++currentSolutionIndex;
+                if (solutionIndex > nmbCalculations)
+                    return bestSolution;
+
+                Solution s = startHeuristic(solutionIndex - 1);
+                size_t rating = s.getRating();
+                if (rating > bestRating)
+                {
+                    bestSolution = s;
+                    bestRating = rating;
+                    std::cout << "[" << threadIndex << "] new best rating : " << bestRating << std::endl;
+                }
+            }
+            return bestSolution;
+        }));
     }
 
     Solution bestSolution(r);
