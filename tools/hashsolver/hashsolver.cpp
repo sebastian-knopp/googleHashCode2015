@@ -48,19 +48,31 @@ int main (int , char *[])
        return r.m_servers[lhs].getRatio() > r.m_servers[rhs].getRatio();
     });
 
+    std::mt19937 rndGenerator;
+    std::uniform_int_distribution<> intDistribution(0, std::numeric_limits<int>::max());
+    std::uniform_real_distribution<> realDistribution(0, 1.0);
 
     Solution bestSolution(r);
     size_t bestRating = bestSolution.getRating();
 
-    for (size_t i = 0; i != 10; ++i)
+    for (size_t i = 0; i != 1000; ++i)
     {
         Solution s(r);
+
+        std::vector<size_t> rowPermutation;
+        for (size_t i = 0; i != r.m_nmbRows; ++i)
+        {
+            rowPermutation.push_back(i);
+        }
+        std::shuffle(begin(rowPermutation), end(rowPermutation), rndGenerator);
 
         auto placeServer = [&] (size_t serverIndex) {
             const Server& server = r.m_servers[serverIndex];
             Coordinate currentCoord;
-            while (currentCoord.m_row < r.m_nmbRows)
+            size_t rowIndex = 0;
+            while (rowIndex < r.m_nmbRows)
             {
+                currentCoord.m_row = rowPermutation[rowIndex];
                 currentCoord.m_slot = 0;
                 while (currentCoord.m_slot < r.m_nmbSlots - server.m_size)
                 {
@@ -76,7 +88,7 @@ int main (int , char *[])
                     }
                     ++currentCoord.m_slot;
                 }
-                ++currentCoord.m_row;
+                ++rowIndex;
             }
         };
 
@@ -94,10 +106,6 @@ int main (int , char *[])
         }
 
     }
-
-    std::mt19937 rndGenerator;
-    std::uniform_int_distribution<> intDistribution(0, std::numeric_limits<int>::max());
-    std::uniform_real_distribution<> realDistribution(0, 1.0);
 
     Solution s = bestSolution;
 
@@ -136,7 +144,7 @@ int main (int , char *[])
     };
 */
     double currentTemperature = 50.0;
-    for (size_t i = 0; i != 1000000; ++i)
+    for (size_t i = 0; i != 2000000; ++i)
     {
         size_t randomIndex1 = placedServerIndices[intDistribution(rndGenerator) % placedServerIndices.size()];
         {
@@ -173,7 +181,7 @@ int main (int , char *[])
             std::cout << "i: "<< i << std::endl;
         }
 
-        currentTemperature *= 0.9;
+        currentTemperature *= 0.9999;
     }
 
     //s.m_servers
