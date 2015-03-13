@@ -4,7 +4,8 @@
 
 
 Solution::Solution(const Request& a_request)
-: m_assignedCapacity(a_request.m_nmbRows, a_request.m_nmbPools, 0)
+: m_servers(a_request.m_servers.size())
+, m_assignedCapacity(a_request.m_nmbRows, a_request.m_nmbPools, 0)
 , m_isAssigned(a_request.m_nmbRows, a_request.m_nmbSlots, 0)
 {
     for (const Coordinate& c : a_request.m_unavailableSlots)

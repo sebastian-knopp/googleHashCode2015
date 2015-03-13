@@ -44,46 +44,61 @@ int main (int , char *[])
     {
         serverPermutation.push_back(i);
     }
-
     std::sort(begin(serverPermutation), end(serverPermutation), [&r] (size_t lhs, size_t rhs){
        return r.m_servers[lhs].getRatio() > r.m_servers[rhs].getRatio();
     });
 
-    Solution s(r);
-    s.m_servers.resize(r.m_servers.size());
 
-    auto placeServer = [&] (size_t serverIndex) {
-        const Server& server = r.m_servers[serverIndex];
-        Coordinate currentCoord;
-        while (currentCoord.m_row < r.m_nmbRows)
-        {
-            currentCoord.m_slot = 0;
-            while (currentCoord.m_slot < r.m_nmbSlots - server.m_size)
-            {
-                if (s.isAvailable(currentCoord, server.m_size))
-                {
-                    s.placeServer(currentCoord, server.m_size);
-                    size_t currentPool = s.getPoolWithMinCapacity(currentCoord.m_row);
-                    s.m_servers[serverIndex].m_coord.m_row = currentCoord.m_row;
-                    s.m_servers[serverIndex].m_coord.m_slot = currentCoord.m_slot;
-                    s.m_servers[serverIndex].m_poolIndex = currentPool;
-                    s.m_assignedCapacity(currentCoord.m_row, currentPool) += server.m_capacity;
-                    return;
-                }
-                ++currentCoord.m_slot;
-            }
-            ++currentCoord.m_row;
-        }
-    };
+    Solution bestSolution(r);
+    size_t bestRating = bestSolution.getRating();
 
-    for (size_t serverIndex : serverPermutation)
+    for (size_t i = 0; i != 10; ++i)
     {
-        placeServer(serverIndex);
-    }
+        Solution s(r);
 
+        auto placeServer = [&] (size_t serverIndex) {
+            const Server& server = r.m_servers[serverIndex];
+            Coordinate currentCoord;
+            while (currentCoord.m_row < r.m_nmbRows)
+            {
+                currentCoord.m_slot = 0;
+                while (currentCoord.m_slot < r.m_nmbSlots - server.m_size)
+                {
+                    if (s.isAvailable(currentCoord, server.m_size))
+                    {
+                        s.placeServer(currentCoord, server.m_size);
+                        size_t currentPool = s.getPoolWithMinCapacity(currentCoord.m_row);
+                        s.m_servers[serverIndex].m_coord.m_row = currentCoord.m_row;
+                        s.m_servers[serverIndex].m_coord.m_slot = currentCoord.m_slot;
+                        s.m_servers[serverIndex].m_poolIndex = currentPool;
+                        s.m_assignedCapacity(currentCoord.m_row, currentPool) += server.m_capacity;
+                        return;
+                    }
+                    ++currentCoord.m_slot;
+                }
+                ++currentCoord.m_row;
+            }
+        };
+
+        for (size_t serverIndex : serverPermutation)
+        {
+            placeServer(serverIndex);
+        }
+
+        size_t rating = s.getRating();
+        if (rating > bestRating)
+        {
+            bestSolution = s;
+            bestRating = rating;
+            std::cout << "[initial] new best rating : "<< bestRating << std::endl;
+        }
+
+    }
     boost::mt19937 rndGenerator;
     boost::random::uniform_int_distribution<> intDistribution(0, std::numeric_limits<int>::max());
     boost::random::uniform_real_distribution<> realDistribution(0, 1.0);
+
+    Solution s = bestSolution;
 
     std::vector<size_t> placedServerIndices;
     for (size_t i = 0; i != r.m_servers.size(); ++i)
@@ -92,8 +107,6 @@ int main (int , char *[])
             placedServerIndices.push_back(i);
     }
 
-    Solution bestSolution = s;
-    size_t bestRating = s.getRating();
     double previousRating = static_cast<double>(bestRating);
     std::cout << "initial rating : " << bestRating << std::endl;
 
