@@ -26,13 +26,15 @@ public:
         return m_assignedCapacity.height();
     }
 
-    bool isAvailable(const Coordinate& a_coord, size_t size) const;
+    bool isPlacable(const Coordinate& a_coord, size_t a_serverIndex) const;
 
-    void placeServer(const Coordinate& a_coord, size_t size);
+    void placeServer(const Coordinate& a_coord, size_t a_serverIndex);
 
     size_t getPoolCapacity(size_t a_pool) const;
 
     size_t getPoolWithMinCapacity(size_t a_row) const;
+
+    bool canSwapServers(size_t a_server1, size_t a_server2);
 
 
 public:

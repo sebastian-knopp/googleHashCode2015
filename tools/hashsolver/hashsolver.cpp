@@ -77,9 +77,9 @@ int main (int , char *[])
                 currentCoord.m_slot = 0;
                 while (currentCoord.m_slot < r.m_nmbSlots - server.m_size)
                 {
-                    if (s.isAvailable(currentCoord, server.m_size))
+                    if (s.isPlacable(currentCoord, serverIndex))
                     {
-                        s.placeServer(currentCoord, server.m_size);
+                        s.placeServer(currentCoord, serverIndex);
                         size_t currentPool = s.getPoolWithMinCapacity(currentCoord.m_row);
                         s.m_servers[serverIndex].m_coord.m_row = currentCoord.m_row;
                         s.m_servers[serverIndex].m_coord.m_slot = currentCoord.m_slot;

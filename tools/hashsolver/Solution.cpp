@@ -46,9 +46,9 @@ size_t Solution::getRating() const
 }
 
 
-bool Solution::isAvailable(const Coordinate& a_coord, size_t size) const
+bool Solution::isPlacable(const Coordinate& a_coord, size_t a_serverIndex) const
 {
-    for (size_t i = 0; i < size; ++i)
+    for (size_t i = 0; i < m_request->m_servers[a_serverIndex].m_size; ++i)
     {
         if (m_isAssigned(a_coord.m_row, a_coord.m_slot + i) == 1)
             return false;
@@ -57,9 +57,9 @@ bool Solution::isAvailable(const Coordinate& a_coord, size_t size) const
 }
 
 
-void Solution::placeServer(const Coordinate& a_coord, size_t size)
+void Solution::placeServer(const Coordinate& a_coord, size_t a_serverIndex)
 {
-    for (size_t i = 0; i < size; ++i)
+    for (size_t i = 0; i < m_request->m_servers[a_serverIndex].m_size; ++i)
     {
         if (m_isAssigned(a_coord.m_row, a_coord.m_slot + i) == 1)
             throw "error";
@@ -97,6 +97,12 @@ size_t Solution::getPoolWithMinCapacity(size_t a_row) const
     return bestPool;
 }
 
+/*
+bool Solution::canSwapServers(size_t a_server1, size_t a_server2)
+{
+    return false;
+}
+*/
 
 std::ostream& operator<<(std::ostream& is, const Solution& a_solution)
 {
