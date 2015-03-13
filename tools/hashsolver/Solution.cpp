@@ -156,8 +156,8 @@ void Solution::swapServers(size_t a_server1, size_t a_server2)
     PlacedServer placed2 = m_servers[a_server2];
     removeServer(a_server1);
     removeServer(a_server2);
-    placeServer(placed1.m_coord, a_server1, placed1.m_poolIndex);
-    placeServer(placed2.m_coord, a_server2, placed2.m_poolIndex);
+    placeServer(placed1.m_coord, a_server1, placed2.m_poolIndex);
+    placeServer(placed2.m_coord, a_server2, placed1.m_poolIndex);
 }
 
 
@@ -287,6 +287,7 @@ Solution simulatedAnnealing(std::mt19937& rndGenerator,
             }
             else
             {
+                //std::cout << "swap move ok" << std::endl;
                 previousRating = currentRating;
             }
 

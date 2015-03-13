@@ -44,7 +44,7 @@ int main (int , char *[])
     Solution bestSolution(r);
     size_t bestRating = bestSolution.getRating();
 
-    for (size_t i = 0; i != 100; ++i)
+    for (size_t i = 0; i != 1000; ++i)
     {
         Solution s(r);
 
@@ -136,7 +136,7 @@ int main (int , char *[])
 
     //s.m_servers
 
-    bestSolution = simulatedAnnealing(rndGenerator, bestSolution, 50.0, 0.9999, 10000000, true);
+    bestSolution = simulatedAnnealing(rndGenerator, bestSolution, 100.0, 0.99999, 10000000, true);
 
     std::cout << "best rating : " << bestSolution.getRating() << std::endl;
 
