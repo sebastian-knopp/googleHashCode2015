@@ -110,7 +110,7 @@ int main (int , char *[])
     std::cout << "initial rating : " << bestRating << std::endl;
 
 
-    bestSolution = simulatedAnnealing(rndGenerator, bestSolution, 100.0, 0.999995, 50000000, true);
+    bestSolution = simulatedAnnealing(rndGenerator, bestSolution, 5.0, 0.999995, 50000000, true);
 
     std::cout << "best rating : " << bestSolution.getRating() << std::endl;
 
