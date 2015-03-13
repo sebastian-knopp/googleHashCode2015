@@ -91,23 +91,23 @@ int main (int , char *[])
 
         //        return simulatedAnnealing(rndGenerator, s, 5.0, 0.99, 1000, false);
 
-        const Solution result = simulatedAnnealing(rndGenerator, s, 100.0, 0.99, 10000, false);
+        const Solution result = simulatedAnnealing(rndGenerator, s, 20.0, 0.999, 5000000, false);
         //std::cout << "end " << a_runIndex << " ("<< result.getRating() << ")" << std::endl;
         return result;
     };
 
     std::atomic<size_t> currentSolutionIndex(0);
 
-    const size_t nmbCalculations = 500;
-    const size_t initialThreads = 4;
+    const size_t nmbCalculations = 64;
+    const size_t nmbThreads = 8;
 
     Solution bestSolution(r);
     size_t bestRating = bestSolution.getRating();
     std::mutex bestMutex;
 
     std::vector<std::future<void>> futures;
-    futures.reserve(initialThreads);
-    for (size_t threadIndex = 0; threadIndex != initialThreads; ++threadIndex)
+    futures.reserve(nmbThreads);
+    for (size_t threadIndex = 0; threadIndex != nmbThreads; ++threadIndex)
     {
         futures.emplace_back(std::async(std::launch::async, [
                                         &r,
@@ -129,9 +129,7 @@ int main (int , char *[])
 
                 Solution s = startHeuristic(solutionIndex - 1, rndGenerator);
                 if (solutionIndex > nmbCalculations)
-                {
-                    const Solution result = simulatedAnnealing(rndGenerator, s, 5.0, 0.999995, 10000000, false);
-                }
+                    return;
 
                 size_t rating = s.getRating();
                 {
