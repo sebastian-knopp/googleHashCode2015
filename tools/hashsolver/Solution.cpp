@@ -71,6 +71,19 @@ void Solution::placeServer(const Coordinate& a_coord, size_t a_serverIndex, size
 }
 
 
+void Solution::removeServer(size_t a_serverIndex)
+{
+    const PlacedServer& server = m_servers[a_serverIndex];
+    m_assignedCapacity(server.m_coord.m_row, server.m_poolIndex) -= m_request->m_servers[a_serverIndex].m_capacity;
+
+    for (size_t i = 0; i < m_request->m_servers[a_serverIndex].m_size; ++i)
+    {
+        m_isAssigned(server.m_coord.m_row, server.m_coord.m_slot + i) = 0;
+    }
+    m_servers[a_serverIndex] = PlacedServer();
+}
+
+
 size_t Solution::getPoolCapacity(size_t a_pool) const
 {
     size_t nmbRows = m_assignedCapacity.width();
