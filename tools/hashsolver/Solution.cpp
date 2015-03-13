@@ -262,7 +262,7 @@ Solution simulatedAnnealing(std::mt19937& rndGenerator,
     double currentTemperature = initialTemperature;
     for (size_t i = 0; i != runs; ++i)
     {
-        size_t moveType = intDistribution(rndGenerator) % 5;
+        size_t moveType = intDistribution(rndGenerator) % 3;
         if (moveType == 0)
         {
             size_t randomIndex1 = placedServerIndices[intDistribution(rndGenerator) % placedServerIndices.size()];

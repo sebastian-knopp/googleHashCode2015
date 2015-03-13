@@ -44,7 +44,7 @@ int main (int , char *[])
     Solution bestSolution(r);
     size_t bestRating = bestSolution.getRating();
 
-    for (size_t i = 0; i != 1000; ++i)
+    for (size_t i = 0; i != 100; ++i)
     {
         Solution s(r);
 
@@ -93,7 +93,7 @@ int main (int , char *[])
             placeServer(serverIndex);
         }
 
-        //s = simulatedAnnealing(rndGenerator, s, 20.0, 0.9, 100, false);
+        s = simulatedAnnealing(rndGenerator, s, 5.0, 0.99, 1000, false);
 
         size_t rating = s.getRating();
         if (rating > bestRating)
@@ -109,40 +109,13 @@ int main (int , char *[])
 
     std::cout << "initial rating : " << bestRating << std::endl;
 
-/*
-    std::vector<size_t> trueServerSize(r.m_servers.size(), 0);
-    for (size_t i = 0; i != r.m_servers.size(); ++i)
-    {
-        trueServerSize[i] = r.m_servers[i].m_size;
-        size_t slotIndex = s.m_servers[i].m_coord.m_slot + r.m_servers[i].m_size;
-        while (slotIndex < r.m_nmbSlots)
-        {
-            if (isAssigned(s.m_servers[i].m_coord.m_row, slotIndex))
-            {
-                trueServerSize[i] = slotIndex - s.m_servers[i].m_coord.m_slot;
-                break;
-            }
 
-            ++slotIndex;
-        }
-        trueServerSize[i] = r.m_nmbSlots - s.m_servers[i].m_coord.m_slot;
-    }
-
-    auto canSwap = [&] (size_t server1, size_t server2) {
-        return r.m_servers[server1].m_size <= trueServerSize[server2] &&
-               r.m_servers[server2].m_size <= trueServerSize[server1];
-    };
-*/
-
-    //s.m_servers
-
-    bestSolution = simulatedAnnealing(rndGenerator, bestSolution, 25.0, 0.99, 10000000, true);
+    bestSolution = simulatedAnnealing(rndGenerator, bestSolution, 100.0, 0.999995, 50000000, true);
 
     std::cout << "best rating : " << bestSolution.getRating() << std::endl;
 
     //s.printSolution();
 
-    //for ();
 
     std::ofstream ofs("D:\\googleHash\\out.txt");
     ofs << s;
