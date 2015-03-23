@@ -12,7 +12,7 @@ int main()
     double e=1.0;
     double facto=1;
 
-    for(i=1;i<=1000;i++){
+    for(i=1;i<=5000;i++){
         facto=facto*i;
         e+=1/facto;
     }
