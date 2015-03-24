@@ -66,3 +66,18 @@ std::istream& operator>>(std::istream& a_is, Street& a_street)
 }
 
 
+void Request::computeAdjacentStreetIndices()
+{
+    m_adjacentStreetIndices.resize(m_junctions.size());
+
+    for (size_t i = 0; i != m_streets.size(); ++i)
+    {
+        const Street& str = m_streets[i];
+        m_adjacentStreetIndices[str.m_junction1Index].push_back(i);
+
+        if (!str.m_isOneway)
+            m_adjacentStreetIndices[str.m_junction2Index].push_back(i);
+    }
+}
+
+

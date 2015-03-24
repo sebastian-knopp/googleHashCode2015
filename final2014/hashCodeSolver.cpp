@@ -1,4 +1,5 @@
 #include "Request.h"
+#include "Result.h"
 #include <fstream>
 #include <iostream>
 
@@ -18,7 +19,14 @@ int main()
     }
 
     fs >> r;
+    r.computeAdjacentStreetIndices();
+
     std::cout << r;
+
+    Result result(r);
+
+    std::ofstream ofs("example.out");
+    ofs << result;
 
     return 0;
 
