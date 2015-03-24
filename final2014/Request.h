@@ -14,6 +14,22 @@ typedef std::vector<Coordinate> Coordinates;
 std::istream& operator>>(std::istream& a_is, Coordinate& a_coord);
 
 
+struct Street
+{
+    size_t m_junction1Index = 0;
+    size_t m_junction2Index = 0;
+    bool m_isOneway = false;
+    int m_cost = 0;
+    int m_length = 0;
+};
+
+
+typedef std::vector<Street> Streets;
+
+std::istream& operator>>(std::istream& a_is, Street& a_street);
+
+
+
 class Request {
 
 public:
@@ -25,12 +41,12 @@ public:
 
 public:
 
-    size_t m_nmbStreets = 0; // denotes the number of streets in the city
     size_t m_availableSecondsPerCar = 0; // denotes the virtual time in seconds allowed for the car itineraries
     size_t m_nmbCars = 0; // denotes the number of cars in the fleet
     size_t m_initialJunctionIndex = 0; // denotes the junction at which all the cars are located initially
 
     Coordinates m_junctions;
+    Streets m_streets;
 
 };
 
