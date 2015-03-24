@@ -38,7 +38,7 @@ public:
     {
     }
 
-    void computeAdjancetStreets();
+    void computeAdjacentStreetIndices();
 
 
 public:

@@ -18,6 +18,8 @@ int main()
     }
 
     fs >> r;
+    r.computeAdjacentStreetIndices();
+
     std::cout << r;
 
     return 0;
