@@ -38,15 +38,20 @@ public:
     {
     }
 
+    void computeAdjancetStreets();
+
 
 public:
 
+    // data read from file
     size_t m_availableSecondsPerCar = 0; // denotes the virtual time in seconds allowed for the car itineraries
     size_t m_nmbCars = 0; // denotes the number of cars in the fleet
     size_t m_initialJunctionIndex = 0; // denotes the junction at which all the cars are located initially
-
     Coordinates m_junctions;
     Streets m_streets;
+
+    // preprocessed data
+    std::vector<std::vector<size_t>> m_adjacentStreetIndices;
 
 };
 
