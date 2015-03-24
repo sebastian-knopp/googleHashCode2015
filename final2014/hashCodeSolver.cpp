@@ -10,7 +10,7 @@ int main()
     std::cout << std::endl;
     std::cout << "hello world" << std::endl;
 
-    Request r;
+    Request req;
     std::ifstream fs("example.in");
     if (!fs)
     {
@@ -18,12 +18,17 @@ int main()
         exit(1);
     }
 
-    fs >> r;
-    r.computeAdjacentStreetIndices();
+    fs >> req;
+    req.computeAdjacentStreetIndices();
 
-    std::cout << r;
+    std::cout << req;
 
-    Result result(r);
+    Result result(req);
+
+    std::vector<size_t> targetJunctionIndices;
+    targetJunctionIndices.resize(req.m_nmbCars, 0);
+
+
 
     std::ofstream ofs("example.out");
     ofs << result;
