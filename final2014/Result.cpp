@@ -66,8 +66,7 @@ void Result::searchGreedilySeb()
     size_t randomizer = 0;
     for (size_t c = 0; c < m_request->m_nmbCars; ++c)
     {
-        bool remainingSeconds = true;
-        while (remainingSeconds)
+        for (;;)
         {
             size_t currentJunction = m_itineraries[c].back();
 
@@ -104,11 +103,12 @@ void Result::searchGreedilySeb()
                 }
             }
 
+            ++randomizer;
+
             if (foundDrivableStreet)
                 addJunction(c,nextJunction);
-
-            remainingSeconds = foundDrivableStreet;
-            ++randomizer;
+            else
+                break;
         }
     }
 }
