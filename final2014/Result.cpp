@@ -8,9 +8,9 @@
 
 Result::Result(const Request& a_request)
 :m_request(&a_request)
-, isStreetTraversed(m_request->m_streets.size(),false)
+, m_isStreetTraversed(m_request->m_streets.size(),false)
+, m_usedCarSeconds(m_request->m_nmbCars, 0)
 {
-
 }
 
 
@@ -81,6 +81,32 @@ bool Result::carCanUseJunction(size_t a_carIndex, size_t a_junctionIndex) const
 }
 
 
+void Result::addJunction(size_t a_carIndex, size_t a_junctionIndex)
+{
+    for (size_t s : m_request->m_adjacentStreetIndices[a_junctionIndex])
+    {
+        const Street& str = m_request->m_streets[s];
+        size_t oppositeJunctionIndex = str.m_junction1Index;
+
+        if (str.m_junction1Index == a_junctionIndex)
+            oppositeJunctionIndex = str.m_junction2Index;
+
+        if (oppositeJunctionIndex != m_itineraries[a_carIndex].back())
+        {
+            std::cerr << "addJunction invalid" << std::endl;
+            exit(1);
+        }
+
+        m_itineraries[a_carIndex].push_back(a_junctionIndex);
+        if (!m_isStreetTraversed[s])
+        {
+            m_totalDistance += str.m_length;
+            m_isStreetTraversed[s] = true;
+        }
+    }
+}
+
+
 std::ostream& operator<<(std::ostream& a_is, const Result& a_result)
 {
     a_is << a_result.m_itineraries.size() << "\n";
@@ -117,7 +143,7 @@ void Result::searchGreedily(){
         size_t currentJunctionIndex=m_itineraries[currentCarIndex].back();
         //While we do not find an available adjacent street that is not traversed and that we have time to go to, we check the following ones
         while(j<m_request->m_adjacentStreetIndices[currentJunctionIndex].size()
-              &&(isStreetTraversed[m_request->m_adjacentStreetIndices[currentJunctionIndex][j]]==true
+              &&(m_isStreetTraversed[m_request->m_adjacentStreetIndices[currentJunctionIndex][j]]==true
               || timeSpanForEachCar[currentCarIndex]+m_request->m_streets[m_request->m_adjacentStreetIndices[currentJunctionIndex][j]].m_cost
               > m_request->m_availableSecondsPerCar || !carCanUseJunction(currentCarIndex,currentJunctionIndex) ) )
             j++;
@@ -130,7 +156,7 @@ void Result::searchGreedily(){
             else
                 m_itineraries[currentCarIndex].push_back(m_request->m_streets[newStreetIndex].m_junction1Index);
             //The street is now crossed
-            isStreetTraversed[newStreetIndex]=true;
+            m_isStreetTraversed[newStreetIndex]=true;
             //The distance is updated
             totalDistance+=m_request->m_streets[newStreetIndex].m_length;
             //The time assigned to the car is updated
@@ -182,10 +208,10 @@ void Result::searchGreedily(){
                 else
                     m_itineraries[currentCarIndex].push_back(m_request->m_streets[newStreetIndex].m_junction1Index);
                 //The distance is updated if it is crossed for the first time
-                if(isStreetTraversed[newStreetIndex]==false)
+                if(m_isStreetTraversed[newStreetIndex]==false)
                     totalDistance+=m_request->m_streets[newStreetIndex].m_length;
                 //The street is now crossed
-                isStreetTraversed[newStreetIndex]=true;
+                m_isStreetTraversed[newStreetIndex]=true;
                 //The time assigned to the car is updated
                 timeSpanForEachCar[currentCarIndex]+=m_request->m_streets[newStreetIndex].m_cost;
                 //Display
@@ -210,10 +236,10 @@ void Result::searchGreedily(){
                     else
                         m_itineraries[currentCarIndex].push_back(m_request->m_streets[newStreetIndex].m_junction1Index);
                     //The distance is updated if it is crossed for the first time
-                    if(isStreetTraversed[newStreetIndex]==false)
+                    if(m_isStreetTraversed[newStreetIndex]==false)
                         totalDistance+=m_request->m_streets[newStreetIndex].m_length;
                     //The street is now crossed
-                    isStreetTraversed[newStreetIndex]=true;
+                    m_isStreetTraversed[newStreetIndex]=true;
                     //The time assigned to the car is updated
                     timeSpanForEachCar[currentCarIndex]+=m_request->m_streets[newStreetIndex].m_cost;
                     //Display

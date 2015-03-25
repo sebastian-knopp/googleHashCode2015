@@ -46,8 +46,10 @@ int main()
 
     Result result(r);
 
-    result.searchGreedily();
+    //result.searchGreedily();
     result.visualize();
+
+    std::cout << "total distance " << result.m_totalDistance << std::endl;
 
     std::ofstream ofs("example.out");
     ofs << result;

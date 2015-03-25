@@ -25,13 +25,18 @@ private:
 
     bool carCanUseJunction(size_t a_carIndex, size_t a_junctionIndex) const;
 
+    void addJunction(size_t a_carIndex, size_t a_junctionIndex);
 
 
 public:
 
     const Request* m_request = nullptr;
 
-    std::vector<bool> isStreetTraversed; //For each street, says if it is traversed or not
+    std::vector<bool> m_isStreetTraversed; //For each street, says if it is traversed or not
+
+    int m_totalDistance = 0;
+
+    std::vector<int> m_usedCarSeconds;
 
     Itineraries m_itineraries;
 
