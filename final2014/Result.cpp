@@ -130,9 +130,39 @@ void Result::searchGreedily(){
                 std::cout<<"Vehicle "<<currentCarIndex <<" : from junction "<< currentJunctionIndex
                    <<" to junction "<<m_itineraries[currentCarIndex][m_itineraries[currentCarIndex].size()-1]<<std::endl;
             }
-            else{//There is nothing we can do, so we stop there for that car
-                timeSpanForEachCar[currentCarIndex]=m_request->m_availableSecondsPerCar;
-                std::cout<<"Vehicle "<<currentCarIndex<<" is full\n\n\n\n";
+            else{//Here, every reachable junction is already visited so we take the first one that is available
+                j=0;
+                while(j<m_request->m_adjacentStreetIndices[currentJunctionIndex].size()
+                      && (!carCanUseJunction(currentCarIndex,currentJunctionIndex)
+                          || timeSpanForEachCar[currentCarIndex]
+                          + m_request->m_streets[m_request->m_adjacentStreetIndices[currentJunctionIndex][j]].m_cost
+                          > m_request->m_availableSecondsPerCar) ){
+                    j++;
+                }
+                if(j<m_request->m_adjacentStreetIndices[currentJunctionIndex].size()){
+                    //Means we found one that we have time to cross and is already traversed
+                    size_t newStreetIndex=m_request->m_adjacentStreetIndices[currentJunctionIndex][j];
+                    //Here, we have to check which junction is the following one in order to add it
+                    if(m_request->m_streets[newStreetIndex].m_junction1Index == currentJunctionIndex)
+                        m_itineraries[currentCarIndex].push_back(m_request->m_streets[newStreetIndex].m_junction2Index);
+                    else
+                        m_itineraries[currentCarIndex].push_back(m_request->m_streets[newStreetIndex].m_junction1Index);
+                    //The distance is updated if it is crossed for the first time
+                    if(isStreetTraversed[newStreetIndex]==false)
+                        totalDistance+=m_request->m_streets[newStreetIndex].m_length;
+                    //The street is now crossed
+                    isStreetTraversed[newStreetIndex]=true;
+                    //The time assigned to the car is updated
+                    timeSpanForEachCar[currentCarIndex]+=m_request->m_streets[newStreetIndex].m_cost;
+                    //Display
+                    std::cout<<"Vehicle "<<currentCarIndex <<" : from junction "<< currentJunctionIndex
+                       <<" to junction "<<m_itineraries[currentCarIndex][m_itineraries[currentCarIndex].size()-1]<<std::endl;
+                }
+                else{
+                    //There is nothing we can do, so we stop there for that car
+                    timeSpanForEachCar[currentCarIndex]=m_request->m_availableSecondsPerCar;
+                    std::cout<<"Vehicle "<<currentCarIndex<<" is full\n\n\n\n";
+                }
             }
         }
 
