@@ -64,10 +64,12 @@ void Result::visualize() const
 
 void Result::searchGreedily()
 {
-    for (size_t c = 0; c < m_request->m_nmbCars; ++c)
+    size_t activeCars = m_request->m_nmbCars;
+    std::vector<bool> carDone(m_request->m_nmbCars, false);
+
+    for (size_t c = 0; ; )
     {
-        bool carDone = false;
-        while (!carDone)
+        while (!carDone[c])
         {
             const auto next = determineNextJunctions(c);
 
@@ -78,11 +80,16 @@ void Result::searchGreedily()
             {
                 if (!addJunction(c, j))
                 {
-                    carDone = true;
+                    carDone[c] = true;
+                    --activeCars;
+                    if (activeCars == 0)
+                        return;
+
                     break;
                 }
             }
         }
+        c = (c + 1) % m_request->m_nmbCars;
     }
 }
 
@@ -141,23 +148,21 @@ bool Result::addJunction(size_t a_carIndex, size_t a_junctionIndex)
 std::vector<size_t> Result::determineNextJunctions(size_t a_carIndex)
 {
     size_t currentJunction = m_itineraries[a_carIndex].back();
+    double maxDist = 0l;
+    size_t i = 0;
+    for (size_t j = 0; j != m_request->m_junctions.size(); ++j)
     {
-        double maxDist = 0l;
-        size_t i = 0;
-        for (size_t j = 0; j != m_request->m_junctions.size(); ++j)
+        //if (carCanUseJunction(a_carIndex, j))
         {
-            if (carCanUseJunction(a_carIndex, j))
+            double dist = getDistance(m_request->m_junctions[currentJunction], m_request->m_junctions[j]);
+            if (dist > maxDist)
             {
-                double dist = getDistance(m_request->m_junctions[currentJunction], m_request->m_junctions[j]);
-                if (dist > maxDist)
-                {
-                    i = j;
-                    maxDist = dist;
-                }
+                i = j;
+                maxDist = dist;
             }
         }
-        return getShortestPath(currentJunction, i);
     }
+    return getShortestPath(currentJunction, i);
 }
 
 
