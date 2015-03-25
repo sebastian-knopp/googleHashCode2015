@@ -85,7 +85,7 @@ void Result::visualize()
     }
     */
 
-    for (size_t carIndex = 0; carIndex < m_request->m_nmbCars; ++carIndex)
+    for (size_t carIndex = 0; carIndex < 1; ++carIndex)
     {
         for (size_t j : m_itineraries[carIndex])
         {
@@ -100,6 +100,7 @@ void Result::visualize()
 
 void Result::searchGreedilySeb()
 {
+    size_t randomizer = 0;
     for (size_t c = 0; c < m_request->m_nmbCars; ++c)
     {
         bool remainingSeconds = true;
@@ -107,8 +108,9 @@ void Result::searchGreedilySeb()
         {
             size_t currentJunction = m_itineraries[c].back();
             bool foundDrivableStreet = false;
-            for (size_t s : m_request->m_adjacentStreetIndices[currentJunction])
+            for (size_t i = 0; i != m_request->m_adjacentStreetIndices[currentJunction].size(); ++i)
             {
+                size_t s = m_request->m_adjacentStreetIndices[currentJunction][(i + randomizer) % m_request->m_adjacentStreetIndices[currentJunction].size()];
                 const Street& str = m_request->m_streets[s];
                 if (m_usedCarSeconds[c] + str.m_cost < m_request->m_availableSecondsPerCar)
                 {
@@ -118,6 +120,7 @@ void Result::searchGreedilySeb()
                 }
             }
             remainingSeconds = foundDrivableStreet;
+            ++randomizer;
         }
     }
 }
