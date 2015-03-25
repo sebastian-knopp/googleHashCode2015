@@ -20,7 +20,7 @@ Result::Result(const Request& a_request)
 }
 
 
-void Result::visualize()
+void Result::visualize() const
 {
     SVGWriter writer("visualize.html");
 

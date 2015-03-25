@@ -18,7 +18,7 @@ public:
 
     explicit Result(const Request& a_request);
 
-    void visualize();
+    void visualize() const;
 
     void searchGreedilySeb();
 
