@@ -11,6 +11,10 @@ Result::Result(const Request& a_request)
 , m_isStreetTraversed(m_request->m_streets.size(),false)
 , m_usedCarSeconds(m_request->m_nmbCars, 0)
 {
+    m_itineraries.resize(m_request->m_nmbCars);
+    //Initializing itinieraries
+    for(size_t i=0;i<m_request->m_nmbCars;++i)
+        m_itineraries[i].push_back(m_request->m_initialJunctionIndex);
 }
 
 
@@ -128,10 +132,7 @@ void Result::searchGreedily(){
     int totalDistance=0;
     std::vector<int> timeSpanForEachCar(m_request->m_nmbCars,0);
     int minTimeSpan=0;
-    m_itineraries.resize(m_request->m_nmbCars);
-    //Initializing itinieraries
-    for(size_t i=0;i<m_request->m_nmbCars;++i)
-        m_itineraries[i].push_back(m_request->m_initialJunctionIndex);
+
     //Start with vehicle 0
     int currentCarIndex=0;
     //To know if we continue or not

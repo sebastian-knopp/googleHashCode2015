@@ -25,6 +25,7 @@ private:
 
     bool carCanUseJunction(size_t a_carIndex, size_t a_junctionIndex) const;
 
+    //! Adds an adjacent junction to the itinary of the given car.
     void addJunction(size_t a_carIndex, size_t a_junctionIndex);
 
 
