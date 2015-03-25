@@ -114,7 +114,7 @@ void Result::searchGreedily(){
     while(go){
         //Choosing next street for current car
         size_t j=0;
-        size_t currentJunctionIndex=m_itineraries[currentCarIndex][m_itineraries[currentCarIndex].size()-1];
+        size_t currentJunctionIndex=m_itineraries[currentCarIndex].back();
         //While we do not find an available adjacent street that is not traversed and that we have time to go to, we check the following ones
         while(j<m_request->m_adjacentStreetIndices[currentJunctionIndex].size()
               &&(isStreetTraversed[m_request->m_adjacentStreetIndices[currentJunctionIndex][j]]==true
