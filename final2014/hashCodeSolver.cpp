@@ -34,10 +34,10 @@ int main()
     //Abdel
     //Sorting street list in the increasing order of length/cost
     sort(r.m_streets.begin(),r.m_streets.end(),compareStreets);
-
+/*
     for(size_t i=0;i<r.m_streets.size();++i)
         std::cout <<"length "<<r.m_streets[i].m_length<<" cost "<<r.m_streets[i].m_cost<<" ratio "<<(double)(r.m_streets[i].m_length)/(double)(r.m_streets[i].m_cost)<<std::endl;
-
+*/
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     r.computeAdjacentStreetIndices();
@@ -45,6 +45,8 @@ int main()
     std::cout << r;
 
     Result result(r);
+
+    result.visualize();
 
     std::ofstream ofs("example.out");
     ofs << result;

@@ -18,10 +18,13 @@ public:
 
     explicit Result(const Request& a_request);
 
+    void visualize();
+
 
 private:
 
     bool carCanUseJunction(size_t a_carIndex, size_t a_junctionIndex) const;
+
 
 
 public:
