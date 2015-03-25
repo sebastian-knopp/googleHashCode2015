@@ -29,40 +29,58 @@ void Result::visualize()
     << "\\pagestyle{empty}\n"
     << "\\begin{tikzpicture}[scale=1, every node/.style={scale=0.3}]\n";
 
-    auto printJunction = [&ofs, this] (size_t a_junctionIndex)
+    auto printJunction = [&ofs, this] (size_t a_junctionIndex, size_t a_color)
     {
-        ofs << "	\\node[circle, ";
+        ofs << "	\\draw[";
 
-        if (a_junctionIndex == m_request->m_initialJunctionIndex)
-            ofs << "fill=red";
-        else if (carCanUseJunction(0, a_junctionIndex))
-            ofs << "fill=yellow";
-        else if (carCanUseJunction(1, a_junctionIndex))
-            ofs << "fill=blue";
-        else if (carCanUseJunction(2, a_junctionIndex))
-            ofs << "fill=purple";
-        else if (carCanUseJunction(3, a_junctionIndex))
+        switch (a_color)
+        {
+            case 0:
+                ofs << "fill=red";
+                break;
+            case 1:
+                ofs << "fill=yellow";
+                break;
+            case 2:
+                ofs << "fill=blue";
+                break;
+            case 3:
+                ofs << "fill=purple";
+                break;
+            case 4:
             ofs << "fill=blue!50";
-        else if (carCanUseJunction(4, a_junctionIndex))
-            ofs << "fill=green!50";
-        else if (carCanUseJunction(5, a_junctionIndex))
-            ofs << "fill=red!50";
-        else if (carCanUseJunction(6, a_junctionIndex))
-            ofs << "fill=cyan";
-        else if (carCanUseJunction(7, a_junctionIndex))
-            ofs << "fill=green";
-        else
-            ofs << "draw=black";
+                break;
+            case 5:
+                ofs << "fill=green!50";
+                break;
+            case 6:
+                ofs << "fill=red!50";
+                break;
+            case 7:
+                ofs << "fill=cyan";
+                break;
+            case 8:
+                ofs << "fill=green";
+                break;
+            default:
+                ofs << "draw=black";
+                break;
+        }
 
-        ofs << "] at (";
-        ofs << getJunctionCoordinatesForTikz(a_junctionIndex)
-            << ") {};\n";
+        ofs << "] " <<getJunctionCoordinatesForTikz(a_junctionIndex) << " circle (2pt);\n";
     };
 
-    printJunction(m_request->m_initialJunctionIndex);
-    for (size_t j = 0; j != m_request->m_junctions.size(); ++j)
+    printJunction(m_request->m_initialJunctionIndex, 0);
+
+    for (size_t j = 0; j != m_request->m_junctions.size()/3; ++j)
     {
-        printJunction(j);
+        size_t carIndex = 0;
+        for (; carIndex < m_request->m_nmbCars; ++carIndex)
+        {
+            if (carCanUseJunction(carIndex, j))
+                break;
+        }
+        printJunction(j, carIndex + 1);
     }
 
     ofs << "\\end{tikzpicture}\n"
@@ -106,9 +124,9 @@ std::string Result::getJunctionCoordinatesForTikz(size_t a_junctionIndex) const
 {
     std::stringstream str;
 
-    str << 100 * (m_request->m_junctions[a_junctionIndex].m_lat - m_request->m_junctions[0].m_lat)
+    str << "(" << 100 * (m_request->m_junctions[a_junctionIndex].m_lat - m_request->m_junctions[0].m_lat)
         << ", "
-        << 100 * (m_request->m_junctions[a_junctionIndex].m_long - m_request->m_junctions[0].m_long);
+        << 100 * (m_request->m_junctions[a_junctionIndex].m_long - m_request->m_junctions[0].m_long) << ")";
 
     return str.str();
 }
