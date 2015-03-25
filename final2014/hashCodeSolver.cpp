@@ -47,7 +47,7 @@ int main()
     Result result(r);
 
     result.searchGreedilySeb();
-    //result.visualize();
+    result.visualize();
 
     std::cout << "total distance " << result.m_totalDistance << std::endl;
 

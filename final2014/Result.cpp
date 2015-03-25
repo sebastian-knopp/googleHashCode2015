@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 
 
 Result::Result(const Request& a_request)
@@ -54,9 +55,7 @@ void Result::visualize()
             ofs << "draw=black";
 
         ofs << "] at (";
-        ofs << 100 * (m_request->m_junctions[a_junctionIndex].m_lat - m_request->m_junctions[0].m_lat)
-            << ", "
-            << 100 * (m_request->m_junctions[a_junctionIndex].m_long - m_request->m_junctions[0].m_long)
+        ofs << getJunctionCoordinatesForTikz(a_junctionIndex)
             << ") {};\n";
     };
 
@@ -100,6 +99,18 @@ bool Result::carCanUseJunction(size_t a_carIndex, size_t a_junctionIndex) const
     double maxAngle = static_cast<double>(a_carIndex + 1) * 2 * pi() / static_cast<double>(m_request->m_nmbCars) - pi();
 
     return minAngle <= angle && angle <= maxAngle;
+}
+
+
+std::string Result::getJunctionCoordinatesForTikz(size_t a_junctionIndex) const
+{
+    std::stringstream str;
+
+    str << 100 * (m_request->m_junctions[a_junctionIndex].m_lat - m_request->m_junctions[0].m_lat)
+        << ", "
+        << 100 * (m_request->m_junctions[a_junctionIndex].m_long - m_request->m_junctions[0].m_long);
+
+    return str.str();
 }
 
 
