@@ -66,17 +66,22 @@ void Result::searchGreedilySeb()
 {
     for (size_t c = 0; c < m_request->m_nmbCars; ++c)
     {
-        for (;;)
+        bool carDone = false;
+        while (!carDone)
         {
-            const auto& next = determineNextJunctions(c);
+            const auto next = determineNextJunctions(c);
             ++m_randomizer;
 
             if (next.empty())
                 break;
 
-            for (size_t j :next )
+            for (size_t j : next)
             {
-                addJunction(c, j);
+                if (!addJunction(c, j))
+                {
+                    carDone = true;
+                    break;
+                }
             }
         }
     }
@@ -109,7 +114,7 @@ std::string Result::getJunctionCoordinatesForTikz(size_t a_junctionIndex) const
 }
 
 
-void Result::addJunction(size_t a_carIndex, size_t a_junctionIndex)
+bool Result::addJunction(size_t a_carIndex, size_t a_junctionIndex)
 {
     bool found = false;
 
@@ -119,6 +124,11 @@ void Result::addJunction(size_t a_carIndex, size_t a_junctionIndex)
 
         if (str.getOppositeJunction(m_itineraries[a_carIndex].back()) != a_junctionIndex)
             continue;
+
+        if (m_usedCarSeconds[a_carIndex] + str.m_cost > m_request->m_availableSecondsPerCar)
+        {
+            return false;
+        }
 
         found = true;
         m_itineraries[a_carIndex].push_back(a_junctionIndex);
@@ -133,18 +143,48 @@ void Result::addJunction(size_t a_carIndex, size_t a_junctionIndex)
 
     if (!found)
     {
-        std::cerr << "addJunction invalid " << std::endl;
+        {
+        SVGWriter writer("invalid.html");
+
+        for (const Street& str : m_request->m_streets)
+        {
+            writer.drawLine(m_request->m_junctions[str.m_junction1Index].m_long,
+                            -m_request->m_junctions[str.m_junction1Index].m_lat,
+                            m_request->m_junctions[str.m_junction2Index].m_long,
+                            -m_request->m_junctions[str.m_junction2Index].m_lat,
+                            0);
+        }
+
+        writer.drawCircle(m_request->m_junctions[a_junctionIndex].m_long,
+                          -m_request->m_junctions[a_junctionIndex].m_lat,
+                          2,
+                          3);
+
+        writer.drawCircle(m_request->m_junctions[m_itineraries[a_carIndex].back()].m_long,
+                          -m_request->m_junctions[m_itineraries[a_carIndex].back()].m_lat,
+                          3,
+                          3);
+
+        writer.drawCircle(m_request->m_junctions[5065].m_long,
+                          -m_request->m_junctions[5065].m_lat,
+                          4,
+                          1);
+
+        std::cerr << "addJunction invalid " << a_junctionIndex << std::endl;
+        }
         exit(1);
     }
+
+    return true;
 }
 
 
 std::vector<size_t> Result::determineNextJunctions(size_t a_carIndex)
 {
-    std::vector<size_t> result;
+    std::cout << "dnj " << a_carIndex << std::endl;
 
     size_t currentJunction = m_itineraries[a_carIndex].back();
-    if (currentJunction == m_request->m_initialJunctionIndex)
+    //if (currentJunction == m_request->m_initialJunctionIndex)
     {
         double maxDist = 0l;
         size_t i = 0;
@@ -162,6 +202,8 @@ std::vector<size_t> Result::determineNextJunctions(size_t a_carIndex)
         }
         return getShortestPath(currentJunction, i);
     }
+
+    std::vector<size_t> result;
 
     bool foundCarRegionStreet = false;
     bool foundDrivableStreet = false;
@@ -205,6 +247,12 @@ std::vector<size_t> Result::determineNextJunctions(size_t a_carIndex)
 
 std::vector<size_t> Result::getShortestPath(size_t a_fromJunction, size_t a_toJunction)
 {
+    std::cout << "from " << a_fromJunction << std::endl;
+    std::cout << "to " << a_toJunction << std::endl;
+
+    if (a_fromJunction == a_toJunction)
+        return std::vector<size_t>();
+
     auto getStreetCost = [&] (const size_t a_streetIndex) {
         if (m_isStreetTraversed[a_streetIndex])
             return m_request->m_streets[a_streetIndex].m_cost;
@@ -269,7 +317,11 @@ std::vector<size_t> Result::getShortestPath(size_t a_fromJunction, size_t a_toJu
         currentJunction = info[currentJunction].m_predIndex;
     }
 
-    result.pop_back();
+    if (result.back() != a_fromJunction)
+        result.empty(); // path not found
+    else
+        result.pop_back();
+
     std::reverse(begin(result), end(result));
     return result;
 }
