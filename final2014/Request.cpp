@@ -119,3 +119,16 @@ std::ostream& operator<<(std::ostream& a_os, const Coordinate& a_coord)
 }
 
 
+size_t Street::getOppositeJunction(const size_t a_junctionIndex) const
+{
+    if (m_junction1Index == a_junctionIndex)
+        return m_junction2Index;
+
+    if (m_junction2Index == a_junctionIndex)
+        return m_junction1Index;
+
+    std::cout << "getOppositeJunction failed (" << a_junctionIndex << ")" << std::endl;
+    std::cout << "J 1 " << m_junction1Index << std::endl;
+    std::cout << "J 2 " << m_junction2Index << std::endl;
+    exit(1);
+}

@@ -27,6 +27,8 @@ std::istream& operator>>(std::istream& a_is, Coordinate& a_coord);
 
 struct Street
 {
+    size_t getOppositeJunction(size_t a_junctionIndex) const;
+
     size_t m_junction1Index = 0;
     size_t m_junction2Index = 0;
     bool m_isOneway = false;

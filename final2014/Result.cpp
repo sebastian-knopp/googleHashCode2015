@@ -71,6 +71,24 @@ void Result::visualize()
 }
 
 
+void Result::searchGreedilySeb()
+{
+    for (size_t c = 0; c < m_request->m_nmbCars; ++c)
+    {
+        size_t currentJunction = m_itineraries[c].back();
+        for (size_t s : m_request->m_adjacentStreetIndices[currentJunction])
+        {
+            const Street& str = m_request->m_streets[s];
+            if (m_usedCarSeconds[c] + str.m_cost < m_request->m_availableSecondsPerCar)
+            {
+                addJunction(c, str.getOppositeJunction(currentJunction));
+                break;
+            }
+        }
+    }
+}
+
+
 bool Result::carCanUseJunction(size_t a_carIndex, size_t a_junctionIndex) const
 {
     if (getDistance(m_request->getOrigin(), m_request->m_junctions[a_junctionIndex]) < 0.02)
@@ -87,26 +105,30 @@ bool Result::carCanUseJunction(size_t a_carIndex, size_t a_junctionIndex) const
 
 void Result::addJunction(size_t a_carIndex, size_t a_junctionIndex)
 {
-    for (size_t s : m_request->m_adjacentStreetIndices[a_junctionIndex])
+    bool found = false;
+
+    for (size_t s : m_request->m_adjacentStreetIndices[m_itineraries[a_carIndex].back()])
     {
         const Street& str = m_request->m_streets[s];
-        size_t oppositeJunctionIndex = str.m_junction1Index;
 
-        if (str.m_junction1Index == a_junctionIndex)
-            oppositeJunctionIndex = str.m_junction2Index;
+        if (str.getOppositeJunction(m_itineraries[a_carIndex].back()) != a_junctionIndex)
+            continue;
 
-        if (oppositeJunctionIndex != m_itineraries[a_carIndex].back())
-        {
-            std::cerr << "addJunction invalid" << std::endl;
-            exit(1);
-        }
-
+        found = true;
         m_itineraries[a_carIndex].push_back(a_junctionIndex);
         if (!m_isStreetTraversed[s])
         {
             m_totalDistance += str.m_length;
             m_isStreetTraversed[s] = true;
         }
+        m_usedCarSeconds[a_carIndex] += str.m_cost;
+        break;
+    }
+
+    if (!found)
+    {
+        std::cerr << "addJunction invalid " << std::endl;
+        exit(1);
     }
 }
 
