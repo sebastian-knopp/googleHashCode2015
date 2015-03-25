@@ -1,4 +1,29 @@
 #include "Request.h"
+#include <iostream>
+
+
+double Coordinate::getLength() const
+{
+    const double squaredSum = m_lat * m_lat + m_long * m_long;
+    if (squaredSum <= 0l)
+        return 0l;
+
+    return std::sqrt(squaredSum);
+}
+
+
+double getDistance(const Coordinate& a_first, const Coordinate& a_second)
+{
+    const Coordinate diff = { a_first.m_lat - a_second.m_lat,
+                              a_first.m_long - a_second.m_long };
+    return diff.getLength();
+}
+
+
+double getAngle(const Coordinate& a_origin, const Coordinate& a_coord)
+{
+    return std::atan2(a_origin.m_lat - a_coord.m_lat, a_origin.m_long - a_coord.m_long);
+}
 
 
 std::istream& operator>>(std::istream& a_is, Coordinate& a_coord)
@@ -78,6 +103,13 @@ void Request::computeAdjacentStreetIndices()
         if (!str.m_isOneway)
             m_adjacentStreetIndices[str.m_junction2Index].push_back(i);
     }
+}
+
+
+std::ostream& operator<<(std::ostream& a_os, const Coordinate& a_coord)
+{
+    a_os << "(" << a_coord.m_lat << ", " << a_coord.m_long << ")";
+    return a_os;
 }
 
 

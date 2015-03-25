@@ -1,16 +1,27 @@
 #pragma once
 #include <istream>
 #include <vector>
+#include <cmath>
 
 
 struct Coordinate
 {
     double m_lat;
     double m_long;
+
+    //! Returns the length when interpreting this as a vector
+    double getLength() const;
+
 };
+
+double getAngle(const Coordinate& a_first, const Coordinate& a_second);
+double getDistance(const Coordinate& a_first, const Coordinate& a_second);
+constexpr double pi() { return std::atan(1)*4; }
+
 
 typedef std::vector<Coordinate> Coordinates;
 
+std::ostream& operator<<(std::ostream& a_os, const Coordinate& a_coord);
 std::istream& operator>>(std::istream& a_is, Coordinate& a_coord);
 
 
