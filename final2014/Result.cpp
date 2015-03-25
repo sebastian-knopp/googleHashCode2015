@@ -44,7 +44,7 @@ void Result::visualize()
 
         writer.drawCircle(m_request->m_junctions[j].m_lat,
                           m_request->m_junctions[j].m_long,
-                          carIndex + 1);
+                          carIndex + 1, 1);
     }
 
     for (size_t carIndex = 0; carIndex < 1; ++carIndex)
@@ -53,7 +53,8 @@ void Result::visualize()
         {
             writer.drawCircle(m_request->m_junctions[j].m_lat,
                               m_request->m_junctions[j].m_long,
-                              carIndex + 1);
+                              carIndex + 1,
+                              4);
         }
     }
 

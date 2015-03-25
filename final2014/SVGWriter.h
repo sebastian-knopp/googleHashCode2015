@@ -16,7 +16,7 @@ public:
 
     ~SVGWriter();
 
-    void drawCircle(double a_x, double a_y, int a_color);
+    void drawCircle(double a_x, double a_y, int a_color, int a_radius);
 
     void drawLine(double a_fromX, double a_fromY, double a_toX, double a_toY, int a_color);
 
@@ -42,6 +42,7 @@ private:
         Coordinate m_fromCoord;
         Coordinate m_toCoord;
         int m_color;
+        int m_radius;
     };
 
     void updateMinMax(const Coordinate& a_coord);
