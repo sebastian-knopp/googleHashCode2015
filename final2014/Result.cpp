@@ -205,6 +205,13 @@ std::vector<size_t> Result::determineNextJunctions(size_t a_carIndex)
 
 std::vector<size_t> Result::getShortestPath(size_t a_fromJunction, size_t a_toJunction)
 {
+    auto getStreetCost = [&] (const size_t a_streetIndex) {
+        if (m_isStreetTraversed[a_streetIndex])
+            return m_request->m_streets[a_streetIndex].m_cost;
+
+        return m_request->m_streets[a_streetIndex].m_cost / m_request->m_streets[a_streetIndex].m_length;
+    };
+
     struct NodeInfo
     {
         int m_cost = std::numeric_limits<int>::max();
@@ -242,7 +249,7 @@ std::vector<size_t> Result::getShortestPath(size_t a_fromJunction, size_t a_toJu
         for (size_t s : m_request->m_adjacentStreetIndices[currentJunction.m_nodeIndex])
         {
             const Street str = m_request->m_streets[s];
-            const int costWhenUsingThisStreet = info[currentJunction.m_nodeIndex].m_cost + str.m_cost;
+            const int costWhenUsingThisStreet = info[currentJunction.m_nodeIndex].m_cost + getStreetCost(s);
 
             const size_t oppositeJunction = str.getOppositeJunction(currentJunction.m_nodeIndex);
             if (costWhenUsingThisStreet < info[oppositeJunction].m_cost)
