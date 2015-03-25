@@ -32,7 +32,7 @@ void Result::visualize() const
                         -m_request->m_junctions[str.m_junction2Index].m_lat,
                         0);
     }
-/*
+
     for (size_t j = 0; j != m_request->m_junctions.size()/3; ++j)
     {
         size_t carIndex = 0;
@@ -43,10 +43,10 @@ void Result::visualize() const
         }
 
         writer.drawCircle(m_request->m_junctions[j].m_long,
-                          -m_request->m_junctions[j].m_long,
-                          carIndex + 1, 1);
+                          -m_request->m_junctions[j].m_lat,
+                          carIndex + 1, 2);
     }
-*/
+
     for (size_t carIndex = 0; carIndex < m_request->m_nmbCars; ++carIndex)
     {
         for (size_t j : m_itineraries[carIndex])
