@@ -47,8 +47,6 @@ public:
 
     Itineraries m_itineraries;
 
-    size_t m_randomizer = 0;
-
 };
 
 

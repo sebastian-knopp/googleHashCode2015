@@ -70,7 +70,6 @@ void Result::searchGreedily()
         while (!carDone)
         {
             const auto next = determineNextJunctions(c);
-            ++m_randomizer;
 
             if (next.empty())
                 break;
@@ -131,35 +130,7 @@ bool Result::addJunction(size_t a_carIndex, size_t a_junctionIndex)
 
     if (!found)
     {
-        {
-        SVGWriter writer("invalid.html");
-
-        for (const Street& str : m_request->m_streets)
-        {
-            writer.drawLine(m_request->m_junctions[str.m_junction1Index].m_long,
-                            -m_request->m_junctions[str.m_junction1Index].m_lat,
-                            m_request->m_junctions[str.m_junction2Index].m_long,
-                            -m_request->m_junctions[str.m_junction2Index].m_lat,
-                            0);
-        }
-
-        writer.drawCircle(m_request->m_junctions[a_junctionIndex].m_long,
-                          -m_request->m_junctions[a_junctionIndex].m_lat,
-                          2,
-                          3);
-
-        writer.drawCircle(m_request->m_junctions[m_itineraries[a_carIndex].back()].m_long,
-                          -m_request->m_junctions[m_itineraries[a_carIndex].back()].m_lat,
-                          3,
-                          3);
-
-        writer.drawCircle(m_request->m_junctions[5065].m_long,
-                          -m_request->m_junctions[5065].m_lat,
-                          4,
-                          1);
-
         std::cerr << "addJunction invalid " << a_junctionIndex << std::endl;
-        }
         exit(1);
     }
 
