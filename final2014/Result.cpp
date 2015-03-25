@@ -1,5 +1,6 @@
 #include "Result.h"
 #include "Request.h"
+#include "SVGWriter.h"
 #include <tuple>
 #include <algorithm>
 #include <fstream>
@@ -21,58 +22,17 @@ Result::Result(const Request& a_request)
 
 void Result::visualize()
 {
-    std::ofstream ofs("tikz.tex");
-    ofs << "\\documentclass{article}\n"
-    << "\\usepackage{tikz}\n"
-    << "\\usetikzlibrary{shapes}\n"
-    << "\\begin{document}\n"
-    << "\\pagestyle{empty}\n"
-    << "\\begin{tikzpicture}[scale=1, every node/.style={scale=0.3}]\n";
+    SVGWriter writer("visualize.html");
 
-    auto printJunction = [&ofs, this] (size_t a_junctionIndex, size_t a_color)
+    for (const Street& str : m_request->m_streets)
     {
-        ofs << "	\\draw[";
+        writer.drawLine(m_request->m_junctions[str.m_junction1Index].m_lat,
+                        m_request->m_junctions[str.m_junction1Index].m_long,
+                        m_request->m_junctions[str.m_junction2Index].m_lat,
+                        m_request->m_junctions[str.m_junction2Index].m_long,
+                        0);
+    }
 
-        switch (a_color)
-        {
-            case 0:
-                ofs << "fill=red";
-                break;
-            case 1:
-                ofs << "fill=yellow";
-                break;
-            case 2:
-                ofs << "fill=blue";
-                break;
-            case 3:
-                ofs << "fill=purple";
-                break;
-            case 4:
-            ofs << "fill=blue!50";
-                break;
-            case 5:
-                ofs << "fill=green!50";
-                break;
-            case 6:
-                ofs << "fill=red!50";
-                break;
-            case 7:
-                ofs << "fill=cyan";
-                break;
-            case 8:
-                ofs << "fill=green";
-                break;
-            default:
-                ofs << "draw=black";
-                break;
-        }
-
-        ofs << "] " <<getJunctionCoordinatesForTikz(a_junctionIndex) << " circle (2pt);\n";
-    };
-
-    printJunction(m_request->m_initialJunctionIndex, 0);
-
-    /*
     for (size_t j = 0; j != m_request->m_junctions.size()/3; ++j)
     {
         size_t carIndex = 0;
@@ -81,20 +41,22 @@ void Result::visualize()
             if (carCanUseJunction(carIndex, j))
                 break;
         }
-        printJunction(j, carIndex + 1);
+
+        writer.drawCircle(m_request->m_junctions[j].m_lat,
+                          m_request->m_junctions[j].m_long,
+                          carIndex + 1);
     }
-    */
 
     for (size_t carIndex = 0; carIndex < 1; ++carIndex)
     {
         for (size_t j : m_itineraries[carIndex])
         {
-            printJunction(j, carIndex + 1);
+            writer.drawCircle(m_request->m_junctions[j].m_lat,
+                              m_request->m_junctions[j].m_long,
+                              carIndex + 1);
         }
     }
 
-    ofs << "\\end{tikzpicture}\n"
-    << "\\end{document}\n";
 }
 
 
