@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <queue>
 
 
 Result::Result(const Request& a_request)
@@ -143,6 +144,10 @@ std::vector<size_t> Result::determineNextJunctions(size_t a_carIndex)
     std::vector<size_t> result;
 
     size_t currentJunction = m_itineraries[a_carIndex].back();
+    if (currentJunction == m_request->m_initialJunctionIndex)
+    {
+        return getShortestPath(currentJunction, 0);
+    }
 
     bool foundCarRegionStreet = false;
     bool foundDrivableStreet = false;
@@ -180,6 +185,71 @@ std::vector<size_t> Result::determineNextJunctions(size_t a_carIndex)
     if (foundDrivableStreet)
         result.push_back(nextJunction);
 
+    return result;
+}
+
+
+std::vector<size_t> Result::getShortestPath(size_t a_fromJunction, size_t a_toJunction)
+{
+    struct NodeInfo
+    {
+        int m_cost = std::numeric_limits<int>::max();
+        size_t m_predIndex = std::numeric_limits<size_t>::max();
+    };
+
+    struct PQEntry
+    {
+        int m_cost;
+        size_t m_nodeIndex;
+
+        bool operator< (const PQEntry& e) const
+        {
+            return m_cost > e.m_cost;
+        }
+    };
+
+    std::vector<NodeInfo> info(m_request->m_junctions.size());
+    info[a_fromJunction].m_cost = 0;
+
+    std::priority_queue<PQEntry> q;
+
+    q.push( PQEntry { 0, a_fromJunction });
+    while (!q.empty())
+    {
+        const PQEntry currentJunction = q.top();
+        if (currentJunction.m_nodeIndex == a_toJunction)
+            break;
+
+        q.pop();
+        if (info[currentJunction.m_nodeIndex].m_cost < currentJunction.m_cost)
+            continue; // node already settled
+
+
+        for (size_t s : m_request->m_adjacentStreetIndices[currentJunction.m_nodeIndex])
+        {
+            const Street str = m_request->m_streets[s];
+            const int costWhenUsingThisStreet = info[currentJunction.m_nodeIndex].m_cost + str.m_cost;
+
+            const size_t oppositeJunction = str.getOppositeJunction(currentJunction.m_nodeIndex);
+            if (costWhenUsingThisStreet < info[oppositeJunction].m_cost)
+            {
+                info[oppositeJunction].m_predIndex = currentJunction.m_nodeIndex;
+                info[oppositeJunction].m_cost = costWhenUsingThisStreet;
+                q.push( PQEntry { info[oppositeJunction].m_cost, oppositeJunction });
+            }
+        }
+    }
+
+    std::vector<size_t> result;
+    size_t currentJunction = a_toJunction;
+    while (currentJunction != std::numeric_limits<size_t>::max())
+    {
+        result.push_back(currentJunction);
+        currentJunction = info[currentJunction].m_predIndex;
+    }
+
+    result.pop_back();
+    std::reverse(begin(result), end(result));
     return result;
 }
 

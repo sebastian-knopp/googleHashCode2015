@@ -44,14 +44,20 @@ SVGWriter::~SVGWriter()
                       << "r=\"" << command.m_radius << "\" stroke=\"black\" stroke-width=\"0\""
                       << "fill=\"" << getColorString(command.m_color) << "\" />\n";
                 break;
-            case CommandType::Line:
-                m_ofs << "<line "
-                      << "x1=\"" << getScaledXValue(command.m_fromCoord.m_x) << "\" "
-                      << "y1=\"" << getScaledYValue(command.m_fromCoord.m_y) << "\" "
-                      << "x2=\"" << getScaledXValue(command.m_toCoord.m_x) << "\" "
-                      << "y2=\"" << getScaledYValue(command.m_toCoord.m_y) << "\" "
-                      << " style=\"stroke:" << getColorString(command.m_color) << ";stroke-width:1\" />\n";
-                break;
+        case CommandType::Line:
+            m_ofs << "<line "
+                  << "x1=\"" << getScaledXValue(command.m_fromCoord.m_x) << "\" "
+                  << "y1=\"" << getScaledYValue(command.m_fromCoord.m_y) << "\" "
+                  << "x2=\"" << getScaledXValue(command.m_toCoord.m_x) << "\" "
+                  << "y2=\"" << getScaledYValue(command.m_toCoord.m_y) << "\" "
+                  << " style=\"stroke:" << getColorString(command.m_color) << ";stroke-width:1\" />\n";
+            break;
+        case CommandType::Text:
+            m_ofs << "<text "
+                  << "x=\"" << getScaledXValue(command.m_fromCoord.m_x) << "\" "
+                  << "y=\"" << getScaledYValue(command.m_fromCoord.m_y) << "\" "
+                  << "font-size=\"10\">" << command.m_text << "</text>\n";
+            break;
         }
     }
 
@@ -66,7 +72,7 @@ void SVGWriter::drawCircle(double a_x, double a_y, int a_color, int a_radius)
     const Coordinate c {  a_x, a_y };
     updateMinMax(c);
 
-    m_commands.push_back(DrawCommand { CommandType::Circle, c, c, a_color, a_radius });
+    m_commands.push_back(DrawCommand { CommandType::Circle, c, c, a_color, a_radius, "" });
 }
 
 
@@ -78,7 +84,16 @@ void SVGWriter::drawLine(double a_fromX, double a_fromY, double a_toX, double a_
     const Coordinate to {  a_toX, a_toY };
     updateMinMax(to);
 
-    m_commands.push_back(DrawCommand { CommandType::Line, from, to, a_color, 0 });
+    m_commands.push_back(DrawCommand { CommandType::Line, from, to, a_color, 0, "" });
+}
+
+
+void SVGWriter::drawText(double a_x, double a_y, const std::string& a_text)
+{
+    const Coordinate c { a_x, a_y };
+    updateMinMax(c);
+
+    m_commands.push_back(DrawCommand { CommandType::Text, c, c, 0, 0, a_text });
 }
 
 

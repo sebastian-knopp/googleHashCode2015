@@ -20,7 +20,10 @@ public:
 
     void drawLine(double a_fromX, double a_fromY, double a_toX, double a_toY, int a_color);
 
+    void drawText(double a_fromX, double a_fromY, const std::string& a_text);
+
     static std::string getColorString(int a_color);
+
 
 private:
 
@@ -33,7 +36,8 @@ private:
     enum class CommandType
     {
         Circle,
-        Line
+        Line,
+        Text
     };
 
     struct DrawCommand
@@ -43,6 +47,7 @@ private:
         Coordinate m_toCoord;
         int m_color;
         int m_radius;
+        std::string m_text;
     };
 
     void updateMinMax(const Coordinate& a_coord);
