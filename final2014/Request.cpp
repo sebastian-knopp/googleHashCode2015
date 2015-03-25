@@ -106,6 +106,12 @@ void Request::computeAdjacentStreetIndices()
 }
 
 
+Coordinate Request::getOrigin() const
+{
+    return m_junctions[m_initialJunctionIndex];
+}
+
+
 std::ostream& operator<<(std::ostream& a_os, const Coordinate& a_coord)
 {
     a_os << "(" << a_coord.m_lat << ", " << a_coord.m_long << ")";

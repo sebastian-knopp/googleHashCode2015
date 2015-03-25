@@ -48,6 +48,8 @@ public:
 
     void computeAdjacentStreetIndices();
 
+    Coordinate getOrigin() const;
+
 
 public:
 

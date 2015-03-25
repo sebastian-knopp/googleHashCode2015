@@ -1,5 +1,7 @@
 #include "Result.h"
-
+#include "Request.h"
+#include <tuple>
+#include <algorithm>
 
 
 Result::Result(const Request& a_request)
@@ -10,7 +12,17 @@ Result::Result(const Request& a_request)
 
 bool Result::carCanUseJunction(size_t a_carIndex, size_t a_junctionIndex) const
 {
-    return true;
+    if (getDistance(m_request->getOrigin(), m_request->m_junctions[a_junctionIndex]) < 100)
+        return true;
+
+    double angle = getAngle(m_request->getOrigin(), m_request->m_junctions[a_junctionIndex]);
+    double minAngle;
+    double maxAngle;
+    std::tie(minAngle, maxAngle) =
+        std::minmax(static_cast<double>(a_carIndex + 1 % m_request->m_nmbCars) * pi() / static_cast<double>(m_request->m_nmbCars),
+                    static_cast<double>(a_carIndex) * pi() / static_cast<double>(m_request->m_nmbCars));
+
+    return minAngle <= angle && angle <= maxAngle;
 }
 
 
