@@ -9,6 +9,12 @@ Result::Result(const Request& a_request)
 }
 
 
+bool Result::carCanUseJunction(size_t a_carIndex, size_t a_junctionIndex) const
+{
+    return true;
+}
+
+
 std::ostream& operator<<(std::ostream& a_is, const Result& a_result)
 {
     a_is << a_result.m_itineraries.size() << "\n";
