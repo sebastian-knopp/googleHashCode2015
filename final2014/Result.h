@@ -25,6 +25,8 @@ public:
 
     Itineraries m_itineraries;
 
+    void searchGreedily();
+
 };
 
 
