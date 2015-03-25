@@ -67,7 +67,7 @@ void Result::visualize()
 
 bool Result::carCanUseJunction(size_t a_carIndex, size_t a_junctionIndex) const
 {
-    if (getDistance(m_request->getOrigin(), m_request->m_junctions[a_junctionIndex]) < 0.0001)
+    if (getDistance(m_request->getOrigin(), m_request->m_junctions[a_junctionIndex]) < 0.02)
         return true;
 
     double angle = getAngle(m_request->getOrigin(), m_request->m_junctions[a_junctionIndex]);
