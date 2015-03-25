@@ -146,7 +146,21 @@ std::vector<size_t> Result::determineNextJunctions(size_t a_carIndex)
     size_t currentJunction = m_itineraries[a_carIndex].back();
     if (currentJunction == m_request->m_initialJunctionIndex)
     {
-        return getShortestPath(currentJunction, 0);
+        double maxDist = 0l;
+        size_t i = 0;
+        for (size_t j = 0; j != m_request->m_junctions.size(); ++j)
+        {
+            if (carCanUseJunction(a_carIndex, j))
+            {
+                double dist = getDistance(m_request->m_junctions[currentJunction], m_request->m_junctions[j]);
+                if (dist > maxDist)
+                {
+                    i = j;
+                    maxDist = dist;
+                }
+            }
+        }
+        return getShortestPath(currentJunction, i);
     }
 
     bool foundCarRegionStreet = false;
