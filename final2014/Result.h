@@ -22,6 +22,8 @@ public:
 
     void searchGreedilySeb();
 
+    void searchGreedily();
+
 
 private:
 
@@ -31,6 +33,8 @@ private:
 
     //! Adds an adjacent junction to the itinary of the given car.
     void addJunction(size_t a_carIndex, size_t a_junctionIndex);
+
+    std::vector<size_t> determineNextJunctions(size_t a_carIndex);
 
 
 public:
@@ -45,7 +49,7 @@ public:
 
     Itineraries m_itineraries;
 
-    void searchGreedily();
+    size_t m_randomizer = 0;
 
 };
 

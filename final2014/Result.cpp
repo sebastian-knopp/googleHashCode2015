@@ -63,52 +63,20 @@ void Result::visualize() const
 
 void Result::searchGreedilySeb()
 {
-    size_t randomizer = 0;
     for (size_t c = 0; c < m_request->m_nmbCars; ++c)
     {
         for (;;)
         {
-            size_t currentJunction = m_itineraries[c].back();
+            const auto& next = determineNextJunctions(c);
+            ++m_randomizer;
 
-            bool foundCarRegionStreet = false;
-            bool foundDrivableStreet = false;
-            bool foundUntraversedStreet = false;
-            size_t nextJunction = 0;
-
-            for (size_t i = 0; i != m_request->m_adjacentStreetIndices[currentJunction].size(); ++i)
-            {
-                size_t s = m_request->m_adjacentStreetIndices[currentJunction][(i + randomizer) % m_request->m_adjacentStreetIndices[currentJunction].size()];
-                const Street& str = m_request->m_streets[s];
-                if (m_usedCarSeconds[c] + str.m_cost < m_request->m_availableSecondsPerCar)
-                {
-                    const size_t oppositeJunction = str.getOppositeJunction(currentJunction);
-                    if (!foundDrivableStreet)
-                    {
-                        nextJunction = oppositeJunction;
-                        foundDrivableStreet = true;
-                    }
-
-                    if (!m_isStreetTraversed[s])
-                    {
-                        nextJunction = oppositeJunction;
-                        foundUntraversedStreet = true;
-                    }
-
-                    if (!foundUntraversedStreet && carCanUseJunction(c, oppositeJunction))
-                    {
-                        nextJunction = oppositeJunction;
-                        foundCarRegionStreet = true;
-                    }
-
-                }
-            }
-
-            ++randomizer;
-
-            if (foundDrivableStreet)
-                addJunction(c,nextJunction);
-            else
+            if (next.empty())
                 break;
+
+            for (size_t j :next )
+            {
+                addJunction(c, j);
+            }
         }
     }
 }
@@ -167,6 +135,52 @@ void Result::addJunction(size_t a_carIndex, size_t a_junctionIndex)
         std::cerr << "addJunction invalid " << std::endl;
         exit(1);
     }
+}
+
+
+std::vector<size_t> Result::determineNextJunctions(size_t a_carIndex)
+{
+    std::vector<size_t> result;
+
+    size_t currentJunction = m_itineraries[a_carIndex].back();
+
+    bool foundCarRegionStreet = false;
+    bool foundDrivableStreet = false;
+    bool foundUntraversedStreet = false;
+    size_t nextJunction = 0;
+
+    for (size_t i = 0; i != m_request->m_adjacentStreetIndices[currentJunction].size(); ++i)
+    {
+        size_t s = m_request->m_adjacentStreetIndices[currentJunction][(i + m_randomizer) % m_request->m_adjacentStreetIndices[currentJunction].size()];
+        const Street& str = m_request->m_streets[s];
+        if (m_usedCarSeconds[a_carIndex] + str.m_cost < m_request->m_availableSecondsPerCar)
+        {
+            const size_t oppositeJunction = str.getOppositeJunction(currentJunction);
+            if (!foundDrivableStreet)
+            {
+                nextJunction = oppositeJunction;
+                foundDrivableStreet = true;
+            }
+
+            if (!m_isStreetTraversed[s])
+            {
+                nextJunction = oppositeJunction;
+                foundUntraversedStreet = true;
+            }
+
+            if (!foundUntraversedStreet && carCanUseJunction(a_carIndex, oppositeJunction))
+            {
+                nextJunction = oppositeJunction;
+                foundCarRegionStreet = true;
+            }
+
+        }
+    }
+
+    if (foundDrivableStreet)
+        result.push_back(nextJunction);
+
+    return result;
 }
 
 
