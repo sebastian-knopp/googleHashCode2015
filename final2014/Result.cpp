@@ -70,18 +70,30 @@ void Result::searchGreedilySeb()
         while (remainingSeconds)
         {
             size_t currentJunction = m_itineraries[c].back();
+
             bool foundDrivableStreet = false;
+            size_t nextJunction = 0;
+
             for (size_t i = 0; i != m_request->m_adjacentStreetIndices[currentJunction].size(); ++i)
             {
                 size_t s = m_request->m_adjacentStreetIndices[currentJunction][(i + randomizer) % m_request->m_adjacentStreetIndices[currentJunction].size()];
                 const Street& str = m_request->m_streets[s];
                 if (m_usedCarSeconds[c] + str.m_cost < m_request->m_availableSecondsPerCar)
                 {
-                    addJunction(c, str.getOppositeJunction(currentJunction));
-                    foundDrivableStreet = true;
-                    break;
+                    if (!foundDrivableStreet)
+                    {
+                        nextJunction = str.getOppositeJunction(currentJunction);
+                        foundDrivableStreet = true;
+                    }
+
+                    if (!m_isStreetTraversed[s])
+                        nextJunction = str.getOppositeJunction(currentJunction);
                 }
             }
+
+            if (foundDrivableStreet)
+                addJunction(c,nextJunction);
+
             remainingSeconds = foundDrivableStreet;
             ++randomizer;
         }
