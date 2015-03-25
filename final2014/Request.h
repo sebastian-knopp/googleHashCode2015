@@ -23,12 +23,9 @@ struct Street
     int m_length = 0;
 };
 
-
 typedef std::vector<Street> Streets;
 
 std::istream& operator>>(std::istream& a_is, Street& a_street);
-
-
 
 class Request {
 
@@ -58,4 +55,6 @@ public:
 std::istream& operator>>(std::istream& a_is, Request& a_request);
 
 std::ostream& operator<<(std::ostream& a_is, const Request& a_request);
+
+
 
