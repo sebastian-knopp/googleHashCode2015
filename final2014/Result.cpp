@@ -71,7 +71,9 @@ void Result::searchGreedilySeb()
         {
             size_t currentJunction = m_itineraries[c].back();
 
+            bool foundCarRegionStreet = false;
             bool foundDrivableStreet = false;
+            bool foundUntraversedStreet = false;
             size_t nextJunction = 0;
 
             for (size_t i = 0; i != m_request->m_adjacentStreetIndices[currentJunction].size(); ++i)
@@ -80,14 +82,25 @@ void Result::searchGreedilySeb()
                 const Street& str = m_request->m_streets[s];
                 if (m_usedCarSeconds[c] + str.m_cost < m_request->m_availableSecondsPerCar)
                 {
+                    const size_t oppositeJunction = str.getOppositeJunction(currentJunction);
                     if (!foundDrivableStreet)
                     {
-                        nextJunction = str.getOppositeJunction(currentJunction);
+                        nextJunction = oppositeJunction;
                         foundDrivableStreet = true;
                     }
 
                     if (!m_isStreetTraversed[s])
-                        nextJunction = str.getOppositeJunction(currentJunction);
+                    {
+                        nextJunction = oppositeJunction;
+                        foundUntraversedStreet = true;
+                    }
+
+                    if (!foundUntraversedStreet && carCanUseJunction(c, oppositeJunction))
+                    {
+                        nextJunction = oppositeJunction;
+                        foundCarRegionStreet = true;
+                    }
+
                 }
             }
 
