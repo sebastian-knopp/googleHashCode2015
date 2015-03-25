@@ -26,10 +26,10 @@ void Result::visualize() const
 
     for (const Street& str : m_request->m_streets)
     {
-        writer.drawLine(m_request->m_junctions[str.m_junction1Index].m_lat,
-                        m_request->m_junctions[str.m_junction1Index].m_long,
-                        m_request->m_junctions[str.m_junction2Index].m_lat,
+        writer.drawLine(m_request->m_junctions[str.m_junction1Index].m_long,
+                        -m_request->m_junctions[str.m_junction1Index].m_lat,
                         m_request->m_junctions[str.m_junction2Index].m_long,
+                        -m_request->m_junctions[str.m_junction2Index].m_lat,
                         0);
     }
 /*
@@ -42,8 +42,8 @@ void Result::visualize() const
                 break;
         }
 
-        writer.drawCircle(m_request->m_junctions[j].m_lat,
-                          m_request->m_junctions[j].m_long,
+        writer.drawCircle(m_request->m_junctions[j].m_long,
+                          -m_request->m_junctions[j].m_long,
                           carIndex + 1, 1);
     }
 */
@@ -51,8 +51,8 @@ void Result::visualize() const
     {
         for (size_t j : m_itineraries[carIndex])
         {
-            writer.drawCircle(m_request->m_junctions[j].m_lat,
-                              m_request->m_junctions[j].m_long,
+            writer.drawCircle(m_request->m_junctions[j].m_long,
+                              -m_request->m_junctions[j].m_lat,
                               carIndex + 1,
                               4);
         }

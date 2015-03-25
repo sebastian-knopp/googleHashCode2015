@@ -6,7 +6,7 @@
 
 class SVGWriter {
 
-    static const int TARGET_SIZE = 800;
+    static const int TARGET_SIZE = 1400;
     static const int BORDER_WIDTH = 10;
 
 
@@ -55,7 +55,7 @@ private:
     std::ofstream m_ofs;
 
     Coordinate m_min = { std::numeric_limits<double>::max(), std::numeric_limits<double>::max() } ;
-    Coordinate m_max = { 0, 0 } ;
+    Coordinate m_max = { -std::numeric_limits<double>::max(), -std::numeric_limits<double>::max() } ;
 
 };
 
