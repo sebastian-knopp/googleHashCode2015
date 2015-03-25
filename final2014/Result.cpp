@@ -102,15 +102,22 @@ void Result::searchGreedilySeb()
 {
     for (size_t c = 0; c < m_request->m_nmbCars; ++c)
     {
-        size_t currentJunction = m_itineraries[c].back();
-        for (size_t s : m_request->m_adjacentStreetIndices[currentJunction])
+        bool remainingSeconds = true;
+        while (remainingSeconds)
         {
-            const Street& str = m_request->m_streets[s];
-            if (m_usedCarSeconds[c] + str.m_cost < m_request->m_availableSecondsPerCar)
+            size_t currentJunction = m_itineraries[c].back();
+            bool foundDrivableStreet = false;
+            for (size_t s : m_request->m_adjacentStreetIndices[currentJunction])
             {
-                addJunction(c, str.getOppositeJunction(currentJunction));
-                break;
+                const Street& str = m_request->m_streets[s];
+                if (m_usedCarSeconds[c] + str.m_cost < m_request->m_availableSecondsPerCar)
+                {
+                    addJunction(c, str.getOppositeJunction(currentJunction));
+                    foundDrivableStreet = true;
+                    break;
+                }
             }
+            remainingSeconds = foundDrivableStreet;
         }
     }
 }
