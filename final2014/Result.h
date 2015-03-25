@@ -28,6 +28,8 @@ public:
 
     const Request* m_request = nullptr;
 
+    std::vector<bool> isStreetTraversed; //For each street, says if it is traversed or not
+
     Itineraries m_itineraries;
 
     void searchGreedily();

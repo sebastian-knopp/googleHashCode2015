@@ -21,7 +21,6 @@ struct Street
     bool m_isOneway = false;
     int m_cost = 0;
     int m_length = 0;
-    bool m_isCrossed=false; /////////Abdel////////to keep track of the state of each street/////////////////
 };
 
 typedef std::vector<Street> Streets;
