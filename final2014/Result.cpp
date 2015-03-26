@@ -186,21 +186,33 @@ bool Result::addJunction(size_t a_carIndex, size_t a_junctionIndex)
 std::vector<size_t> Result::determineNextJunctions(size_t a_carIndex)
 {
     size_t currentJunction = m_itineraries[a_carIndex].back();
-    double maxDist = 0l;
-    size_t i = 0;
-    for (size_t j = 0; j != m_request->m_junctions.size(); ++j)
+    double maxDist = -1l;
+    size_t i1 = 0;
+    size_t i2 = 0;
+
+    for (size_t j = 0; j != m_request->m_streets.size(); ++j)
     {
-        if (carCanUseJunction(a_carIndex, j))
+        if (!m_isStreetTraversed[j] && carCanUseJunction(a_carIndex, m_request->m_streets[j].m_junction1Index))
         {
-            double dist = getDistance(m_request->m_junctions[currentJunction], m_request->m_junctions[j]);
-            if (dist > maxDist)
+            double dist = getDistance(m_request->m_junctions[currentJunction], m_request->m_junctions[m_request->m_streets[j].m_junction1Index]);
+            if (dist > maxDist && m_request->m_streets[j].m_junction1Index != currentJunction)
             {
-                i = j;
+                i1 = m_request->m_streets[j].m_junction1Index;
+                i2 = m_request->m_streets[j].m_junction2Index;
                 maxDist = dist;
             }
         }
     }
-    return getShortestPath(currentJunction, i, a_carIndex);
+
+    if (maxDist < 0)
+        return std::vector<size_t>();
+
+    std::vector<size_t> result = getShortestPath(currentJunction, i1, a_carIndex);
+
+    if (result.size() > 1 && result[result.size() - 1] != i2)
+        result.push_back(i2);
+
+    return result;
 }
 
 
