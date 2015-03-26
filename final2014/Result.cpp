@@ -65,17 +65,8 @@ Result::Result(const Request& a_request)
 void Result::visualize() const
 {
     SVGWriter writer("visualize.html");
-
-    for (const Street& str : m_request->m_streets)
-    {
-        writer.drawLine(m_request->m_junctions[str.m_junction1Index].m_long,
-                        -m_request->m_junctions[str.m_junction1Index].m_lat,
-                        m_request->m_junctions[str.m_junction2Index].m_long,
-                        -m_request->m_junctions[str.m_junction2Index].m_lat,
-                        0);
-    }
-
-    for (size_t j = 0; j != m_request->m_junctions.size()/3; ++j)
+/*
+    for (size_t j = 0; j != m_request->m_junctions.size(); ++j)
     {
         size_t carIndex = 0;
         for (; carIndex < m_request->m_nmbCars; ++carIndex)
@@ -87,6 +78,17 @@ void Result::visualize() const
         writer.drawCircle(m_request->m_junctions[j].m_long,
                           -m_request->m_junctions[j].m_lat,
                           carIndex + 1, 2);
+    }
+*/
+    for (size_t sIndex = 0; sIndex != m_request->m_junctions.size(); ++sIndex)
+    {
+        const Street& str = m_request->m_streets[sIndex];
+
+        writer.drawLine(m_request->m_junctions[str.m_junction1Index].m_long,
+                        -m_request->m_junctions[str.m_junction1Index].m_lat,
+                        m_request->m_junctions[str.m_junction2Index].m_long,
+                        -m_request->m_junctions[str.m_junction2Index].m_lat,
+                        m_isStreetTraversed[sIndex] ? 0 : 8);
     }
 
     for (size_t carIndex = 0; carIndex < m_request->m_nmbCars; ++carIndex)
@@ -221,15 +223,15 @@ std::vector<size_t> Result::getShortestPath(size_t a_fromJunction, size_t a_toJu
     if (a_fromJunction == a_toJunction)
         return std::vector<size_t>();
 
-    auto getStreetCost = [&] (const size_t a_streetIndex) {
+    auto getStreetCost = [&] (const size_t a_currentJunction, const size_t a_streetIndex) {
         int m = 1;
-        if (!carCanUseJunction(a_carIndex, m_request->m_streets[a_streetIndex].m_junction1Index))
+        if (!carCanUseJunction(a_carIndex, m_request->m_streets[a_streetIndex].getOppositeJunction(a_currentJunction)))
             m = 5;
 
         if (m_isStreetTraversed[a_streetIndex])
-            return m * m_request->m_streets[a_streetIndex].m_cost;
+            return 10 * m * m_request->m_streets[a_streetIndex].m_cost;
 
-        return m * m_request->m_streets[a_streetIndex].m_cost / m_request->m_streets[a_streetIndex].m_length;
+        return m * m_request->m_streets[a_streetIndex].m_cost / (m_request->m_streets[a_streetIndex].m_length);
     };
 
     struct NodeInfo
@@ -268,7 +270,7 @@ std::vector<size_t> Result::getShortestPath(size_t a_fromJunction, size_t a_toJu
         for (size_t s : m_request->m_adjacentStreetIndices[currentJunction.m_nodeIndex])
         {
             const Street str = m_request->m_streets[s];
-            const int costWhenUsingThisStreet = info[currentJunction.m_nodeIndex].m_cost + getStreetCost(s);
+            const int costWhenUsingThisStreet = info[currentJunction.m_nodeIndex].m_cost + getStreetCost(currentJunction.m_nodeIndex, s);
 
             const size_t oppositeJunction = str.getOppositeJunction(currentJunction.m_nodeIndex);
             if (costWhenUsingThisStreet < info[oppositeJunction].m_cost)

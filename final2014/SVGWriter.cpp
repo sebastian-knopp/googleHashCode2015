@@ -50,7 +50,7 @@ SVGWriter::~SVGWriter()
                   << "y1=\"" << getScaledYValue(command.m_fromCoord.m_y) << "\" "
                   << "x2=\"" << getScaledXValue(command.m_toCoord.m_x) << "\" "
                   << "y2=\"" << getScaledYValue(command.m_toCoord.m_y) << "\" "
-                  << " style=\"stroke:" << getColorString(command.m_color) << ";stroke-width:1\" />\n";
+                  << " style=\"stroke:" << getColorString(command.m_color) << ";stroke-width:2\" />\n";
             break;
         case CommandType::Text:
             m_ofs << "<text "
