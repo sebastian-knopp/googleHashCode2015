@@ -47,6 +47,8 @@ public:
 
     Itineraries m_itineraries;
 
+    std::vector<size_t> m_carAssignedToStreet;
+
 };
 
 

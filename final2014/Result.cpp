@@ -11,13 +11,54 @@
 
 Result::Result(const Request& a_request)
 :m_request(&a_request)
-, m_isStreetTraversed(m_request->m_streets.size(),false)
+, m_isStreetTraversed(m_request->m_streets.size(), false)
 , m_usedCarSeconds(m_request->m_nmbCars, 0)
+, m_itineraries(m_request->m_nmbCars)
+, m_carAssignedToStreet(m_request->m_streets.size(), 0)
 {
-    m_itineraries.resize(m_request->m_nmbCars);
-    //Initializing itinieraries
-    for(size_t i=0;i<m_request->m_nmbCars;++i)
-        m_itineraries[i].push_back(m_request->m_initialJunctionIndex);
+    for (Itinerary& it : m_itineraries)
+    {
+        it.push_back(m_request->m_initialJunctionIndex);
+    }
+
+    std::vector<size_t> streetPermutation;
+    streetPermutation.reserve(m_request->m_streets.size());
+    for (size_t i = 0; i != m_request->m_streets.size(); ++i)
+    {
+        streetPermutation.push_back(i);
+    }
+
+    std::sort(begin(streetPermutation), end(streetPermutation), [this] (size_t lhs, size_t rhs){
+
+        const double angleLhs = getAngle(m_request->getOrigin(), m_request->m_junctions[m_request->m_streets[lhs].m_junction1Index]);
+        const double angleRhs = getAngle(m_request->getOrigin(), m_request->m_junctions[m_request->m_streets[rhs].m_junction1Index]);
+        return angleLhs < angleRhs;
+
+    });
+
+    int overallCost = 0;
+    int overallLength = 0;
+    for (const size_t s : streetPermutation)
+    {
+        overallCost += m_request->m_streets[s].m_cost;
+        overallLength += m_request->m_streets[s].m_length;
+    }
+    std::cout << "overall cost: " << overallCost << std::endl;
+    std::cout << "overall length: " << overallLength << std::endl;
+
+    int costPerCar = overallCost / m_request->m_nmbCars;
+    int currentCost = 0;
+    size_t carIndex = 0;
+    for (size_t i = 0; i != m_request->m_streets.size(); ++i)
+    {
+        m_carAssignedToStreet[streetPermutation[i]] = carIndex;
+        currentCost += m_request->m_streets[streetPermutation[i]].m_cost;
+        if (currentCost > costPerCar)
+        {
+            currentCost -= costPerCar;
+            ++carIndex;
+        }
+    }
 }
 
 
@@ -96,15 +137,12 @@ void Result::searchGreedily()
 
 bool Result::carCanUseJunction(size_t a_carIndex, size_t a_junctionIndex) const
 {
-    if (getDistance(m_request->getOrigin(), m_request->m_junctions[a_junctionIndex]) < 0.02)
-        return true;
-
-    double angle = getAngle(m_request->getOrigin(), m_request->m_junctions[a_junctionIndex]);
-
-    double minAngle = static_cast<double>(a_carIndex) * 2 * pi() / static_cast<double>(m_request->m_nmbCars) - pi();
-    double maxAngle = static_cast<double>(a_carIndex + 1) * 2 * pi() / static_cast<double>(m_request->m_nmbCars) - pi();
-
-    return minAngle <= angle && angle <= maxAngle;
+    for (size_t s : m_request->m_adjacentStreetIndices[a_junctionIndex])
+    {
+        if (m_carAssignedToStreet[s] == a_carIndex)
+            return true;
+    }
+    return false;
 }
 
 
@@ -173,8 +211,7 @@ std::vector<size_t> Result::getShortestPath(size_t a_fromJunction, size_t a_toJu
 
     auto getStreetCost = [&] (const size_t a_streetIndex) {
         int m = 1;
-        if (!carCanUseJunction(a_carIndex, m_request->m_streets[a_streetIndex].m_junction1Index) ||
-            !carCanUseJunction(a_carIndex, m_request->m_streets[a_streetIndex].m_junction2Index))
+        if (!carCanUseJunction(a_carIndex, m_request->m_streets[a_streetIndex].m_junction1Index))
             m = 5;
 
         if (m_isStreetTraversed[a_streetIndex])
@@ -215,7 +252,6 @@ std::vector<size_t> Result::getShortestPath(size_t a_fromJunction, size_t a_toJu
         q.pop();
         if (info[currentJunction.m_nodeIndex].m_cost < currentJunction.m_cost)
             continue; // node already settled
-
 
         for (size_t s : m_request->m_adjacentStreetIndices[currentJunction.m_nodeIndex])
         {
