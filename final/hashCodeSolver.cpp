@@ -1,4 +1,5 @@
 #include "Request.h"
+#include "Response.h"
 #include <iostream>
 #include <fstream>
 
@@ -13,6 +14,14 @@ int solve(int, char* [])
     ifs >> request;
     std::cout << request << std::endl;
 
+    Response resp(request);
+
+    resp.solve();
+    resp.visualize();
+
+    std::ofstream ofs("example.out");
+    ofs << resp;
+
     return 0;
 }
 
@@ -23,8 +32,6 @@ int main(int a_argn, char* a_argv[])
     std::cout << "|         Google Hash Code Challenge 2015           |" << std::endl;
     std::cout << "| Team: A211 - Mines Saint-Etienne - Gardanne - SFL |" << std::endl;
     std::cout << " --------------------------------------------------- " << std::endl;
-    std::cout << std::endl;
-    std::cout << std::endl;
     std::cout << std::endl;
 
     try
