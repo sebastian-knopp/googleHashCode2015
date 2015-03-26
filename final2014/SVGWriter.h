@@ -22,8 +22,6 @@ public:
 
     void drawText(double a_fromX, double a_fromY, const std::string& a_text);
 
-    static std::string getColorString(int a_color);
-
 
 private:
 
@@ -51,6 +49,8 @@ private:
     };
 
     void updateMinMax(const Coordinate& a_coord);
+
+    static std::string getColorString(int a_color);
 
 
 private:
