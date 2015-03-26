@@ -6,10 +6,7 @@ import sys
 # This includes:
 # - Header file
 # - Source file
-# - Unit test
 
-
-libraryDefault = "scheduler"
 
 print("")
 
