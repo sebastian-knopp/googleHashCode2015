@@ -1,6 +1,7 @@
 #include "Response.h"
 #include "Request.h"
 #include "SVGWriter.h"
+#include "Assertion.h"
 
 
 Response::Response(const Request& a_request)
@@ -12,6 +13,7 @@ Response::Response(const Request& a_request)
 void Response::solve()
 {
     m_result = m_request->m_test * m_request->m_test;
+    ASSERT(m_result == 42 * 42);
 }
 
 

@@ -20,7 +20,7 @@ int solve(int, char* [])
     resp.visualize();
 
     std::ofstream ofs("example.out");
-    ofs << resp;
+    ofs << resp << std::endl;
 
     return 0;
 }
