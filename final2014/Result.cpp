@@ -64,7 +64,7 @@ Result::Result(const Request& a_request)
 
 void Result::visualize() const
 {
-    SVGWriter writer("visualize.html");
+    SVGWriter writer("visualize.html", 1200, 10);
 /*
     for (size_t j = 0; j != m_request->m_junctions.size(); ++j)
     {
