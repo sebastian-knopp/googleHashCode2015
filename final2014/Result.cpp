@@ -152,7 +152,7 @@ std::vector<size_t> Result::determineNextJunctions(size_t a_carIndex)
     size_t i = 0;
     for (size_t j = 0; j != m_request->m_junctions.size(); ++j)
     {
-        //if (carCanUseJunction(a_carIndex, j))
+        if (carCanUseJunction(a_carIndex, j))
         {
             double dist = getDistance(m_request->m_junctions[currentJunction], m_request->m_junctions[j]);
             if (dist > maxDist)
@@ -162,20 +162,25 @@ std::vector<size_t> Result::determineNextJunctions(size_t a_carIndex)
             }
         }
     }
-    return getShortestPath(currentJunction, i);
+    return getShortestPath(currentJunction, i, a_carIndex);
 }
 
 
-std::vector<size_t> Result::getShortestPath(size_t a_fromJunction, size_t a_toJunction)
+std::vector<size_t> Result::getShortestPath(size_t a_fromJunction, size_t a_toJunction, size_t a_carIndex)
 {
     if (a_fromJunction == a_toJunction)
         return std::vector<size_t>();
 
     auto getStreetCost = [&] (const size_t a_streetIndex) {
-        if (m_isStreetTraversed[a_streetIndex])
-            return m_request->m_streets[a_streetIndex].m_cost;
+        int m = 1;
+        if (!carCanUseJunction(a_carIndex, m_request->m_streets[a_streetIndex].m_junction1Index) ||
+            !carCanUseJunction(a_carIndex, m_request->m_streets[a_streetIndex].m_junction2Index))
+            m = 5;
 
-        return m_request->m_streets[a_streetIndex].m_cost / m_request->m_streets[a_streetIndex].m_length;
+        if (m_isStreetTraversed[a_streetIndex])
+            return m * m_request->m_streets[a_streetIndex].m_cost;
+
+        return m * m_request->m_streets[a_streetIndex].m_cost / m_request->m_streets[a_streetIndex].m_length;
     };
 
     struct NodeInfo

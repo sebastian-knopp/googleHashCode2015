@@ -32,7 +32,7 @@ private:
 
     std::vector<size_t> determineNextJunctions(size_t a_carIndex);
 
-    std::vector<size_t> getShortestPath(size_t a_fromJunction, size_t a_toJunction);
+    std::vector<size_t> getShortestPath(size_t a_fromJunction, size_t a_toJunction, size_t a_carIndex);
 
 
 public:
