@@ -1,5 +1,15 @@
 #pragma once
 #include <ostream>
+#include <vector>
+
+
+struct Slice
+{
+    size_t m_row1;
+    size_t m_row2;
+    size_t m_column1;
+    size_t m_column2;
+};
 
 
 class Request;
@@ -20,12 +30,14 @@ public:
 
 private:
 
-    int m_result = 0;
+    std::vector<Slice> m_slices;
 
     const Request* m_request;
 
 };
 
 
-std::ostream& operator<<(std::ostream& a_is, const Response& a_request);
+std::ostream& operator<<(std::ostream& a_os, const Response& a_request);
+
+std::ostream& operator<<(std::ostream& a_os, const Slice& a_slice);
 

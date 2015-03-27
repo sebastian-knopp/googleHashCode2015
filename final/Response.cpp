@@ -32,7 +32,19 @@ void Response::visualize() const
 
 std::ostream& operator<<(std::ostream& a_is, const Response& a_response)
 {
-    a_is << a_response.m_result;
+    for (const Slice& s : a_response.m_slices)
+    {
+        a_is << s;
+    }
     return a_is;
 }
 
+
+std::ostream& operator<<(std::ostream& a_os, const Slice& a_slice)
+{
+    a_os << a_slice.m_row1;
+    a_os << a_slice.m_column1;
+    a_os << a_slice.m_row2;
+    a_os << a_slice.m_column2;
+    return a_os;
+}
