@@ -76,7 +76,7 @@ void Response::calcSlice(const Slice a_slice)
         *beginTest = split;
         *endTest = split;
         sumHam += m_request->getNmbHam(test);
-        if (sumHam > nmbHamOrig / 2)
+        if (sumHam > nmbHamOrig / 2 && sumHam >= m_request->minNmbHam)
             break;
     }
 
@@ -95,22 +95,22 @@ void Response::calcSlice(const Slice a_slice)
 
 void Response::visualize() const
 {
-    SVGWriter writer("visualize.html", 800, 30);
+    SVGWriter writer("visualize.html", 1300, 30);
 
     for (size_t c = 0; c < m_request->getNmbColumns(); ++c)
     {
         for (size_t r = 0; r < m_request->getNmbRows(); ++r)
         {
             if (m_request->m_pizza[c][r] == Taste::Ham)
-                writer.drawRectangle(c, r, c+1, r+1, 0);
+                writer.drawRectangle(r, c, r+1, c+1, 0);
             else
-                writer.drawRectangle(c, r, c+1, r+1, 1);
+                writer.drawRectangle(r, c, r+1, c+1, 1);
         }
     }
 
     for (const Slice& s : m_slices)
     {
-        writer.drawRectangle(s.m_column1, s.m_row1, s.m_column2+1, s.m_row2+1, 7, 1);
+        writer.drawRectangle(s.m_row1, s.m_column1, s.m_row2+1, s.m_column2+1, 7, 1);
     }
 }
 
