@@ -19,6 +19,8 @@ int solve(int, char* [])
     resp.solve();
     resp.visualize();
 
+    std::cout << "Overall cells " << resp.getOverallCells() << std::endl;
+
     std::ofstream ofs("example.out");
     ofs << resp << std::endl;
 

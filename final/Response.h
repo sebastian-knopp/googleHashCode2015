@@ -21,12 +21,15 @@ public:
 
     void visualize() const;
 
+    size_t getOverallCells();
 
 private:
 
+    const Request* m_request;
+
     std::vector<Slice> m_slices;
 
-    const Request* m_request;
+    size_t m_overallCells = 0;
 
 };
 

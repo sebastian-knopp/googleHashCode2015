@@ -37,6 +37,7 @@ void Response::calcSlice(const Slice a_slice)
 
     if (a_slice.getNmbCells() <= m_request->maxNmbCells)
     {
+        m_overallCells += a_slice.getNmbCells();
         m_slices.push_back(a_slice);
         return;
     }
@@ -107,6 +108,12 @@ void Response::visualize() const
         }
     }
 
+}
+
+
+size_t Response::getOverallCells()
+{
+    return m_overallCells;
 }
 
 
