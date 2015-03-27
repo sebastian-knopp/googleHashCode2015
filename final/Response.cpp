@@ -32,9 +32,6 @@ void Response::solve()
 
 void Response::calcSlice(const Slice a_slice)
 {
-    std::cout << "s: " << a_slice << std::endl;
-//    std::cout << "ham: " << m_request->getNmbHam(a_slice) << std::endl;
-//    std::cout << "minham: " << m_request->minNmbHam << std::endl;
     if (m_request->getNmbHam(a_slice) < m_request->minNmbHam)
         return;
 
@@ -67,10 +64,6 @@ void Response::calcSlice(const Slice a_slice)
 
     if (*endOfFirst >= *endOrig)
         return;
-
-    static  int c = 0;
-    ++c;
-    std::cout << c << std::endl;
 
     calcSlice(first);
 
