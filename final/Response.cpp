@@ -55,32 +55,28 @@ void Response::calcSlice(const Slice a_slice)
     if (a_slice.m_column1 == a_slice.m_column2)
         return;
 
+    size_t width = a_slice.m_row2 - a_slice.m_row1;
+    size_t height = a_slice.m_column2 - a_slice.m_row1;
+
     Slice s1 = a_slice;
     Slice s2 = a_slice;
 
-    size_t splitRow = (a_slice.m_row2 + a_slice.m_row1) / 2;
-    s1.m_row2 = splitRow;
-    s2.m_row1 = splitRow + 1;
-
-    Slice s3 = s1;
-    Slice s4 = s2;
-
-    size_t splitColumn = (a_slice.m_column2 + a_slice.m_column1) / 2;
-    s3.m_column1 = splitColumn + 1;
-    s4.m_column1 = splitColumn + 1;
-    s1.m_column2 = splitColumn;
-    s2.m_column2 = splitColumn;
-
-
-    ASSERT(s1.m_row2 < s2.m_row1);
-    ASSERT(s3.m_row2 < s4.m_row1);
-    ASSERT(s1.m_column2 < s3.m_column1);
-    ASSERT(s2.m_column2 < s4.m_column1);
-
-    calcSlice(s1);
-    calcSlice(s2);
-    calcSlice(s3);
-    calcSlice(s4);
+    if (width > height)
+    {
+        size_t splitRow = (a_slice.m_row2 + a_slice.m_row1) / 2;
+        s1.m_row2 = splitRow;
+        s2.m_row1 = splitRow + 1;
+        calcSlice(s1);
+        calcSlice(s2);
+    }
+    else
+    {
+        size_t splitColumn = (a_slice.m_column2 + a_slice.m_column1) / 2;
+        s1.m_column2 = splitColumn;
+        s2.m_column1 = splitColumn + 1;
+        calcSlice(s1);
+        calcSlice(s2);
+    }
 }
 
 
