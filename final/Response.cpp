@@ -60,8 +60,22 @@ void Response::calcSlice(const Slice a_slice)
     if (a_slice.m_row1 == a_slice.m_row2)
         return;
 
+    Slice s3 = s1;
+    Slice s4 = s2;
+
+    size_t splitColumn = (a_slice.m_column2 + a_slice.m_column1) / 2;
+    s3.m_column2 = splitColumn;
+    s4.m_column1 = splitColumn + 1;
+    s1.m_column2 = splitColumn;
+    s2.m_column1 = splitColumn + 1;
+
+    if (a_slice.m_column1 == a_slice.m_column2)
+        return;
+
     calcSlice(s1);
     calcSlice(s2);
+    calcSlice(s3);
+    calcSlice(s4);
 }
 
 
