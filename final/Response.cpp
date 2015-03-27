@@ -62,12 +62,12 @@ void Response::calcSlice(const Slice a_slice)
         //std::cout << "m" << std::endl;
         //return;
     }
-
+/*
     if (a_slice.m_row1 == a_slice.m_row2)
         return;
     if (a_slice.m_column1 == a_slice.m_column2)
         return;
-
+*/
     size_t width = a_slice.m_row2 - a_slice.m_row1;
     size_t height = a_slice.m_column2 - a_slice.m_row1;
 
@@ -78,19 +78,27 @@ void Response::calcSlice(const Slice a_slice)
     {
         size_t splitRow = (a_slice.m_row2 + a_slice.m_row1) / 2;
         s1.m_row2 = splitRow;
+
+        if (s1.m_row2 != a_slice.m_row2)
+            calcSlice(s1);
+
         s2.m_row1 = splitRow + 1;
-//        std::cout << "w" << std::endl;
-        calcSlice(s1);
-        calcSlice(s2);
+
+        if (s2.m_row1 < m_request->getNmbRows())
+            calcSlice(s2);
     }
     else
     {
-        size_t splitColumn = (a_slice.m_column2 + a_slice.m_column1) / 2;
+        size_t columnSum = a_slice.m_column2 + a_slice.m_column1;
+        size_t splitColumn = columnSum / 2;
         s1.m_column2 = splitColumn;
+
+        if (s1.m_column2 != a_slice.m_column2)
+            calcSlice(s1);
+
         s2.m_column1 = splitColumn + 1;
-//        std::cout << "h" << std::endl;
-        calcSlice(s1);
-        calcSlice(s2);
+        if (s2.m_column1 < m_request->getNmbColumns())
+            calcSlice(s2);
     }
 }
 
