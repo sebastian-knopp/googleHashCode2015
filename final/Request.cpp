@@ -21,9 +21,9 @@ std::istream& operator>>(std::istream& a_is, Request& a_request)
             char taste;
             a_is >> taste;
             if (taste=='H')
-                a_request.m_pizza[r][c] = Taste::Ham;
+                a_request.m_pizza[c][r] = Taste::Ham;
             else
-                a_request.m_pizza[r][c] = Taste::Other;
+                a_request.m_pizza[c][r] = Taste::Other;
         }
     }
     return a_is;
