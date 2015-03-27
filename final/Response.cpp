@@ -60,7 +60,7 @@ void Response::calcSlice(const Slice a_slice)
             m_slices.push_back(a_slice);
         }
         //std::cout << "m" << std::endl;
-        //return;
+        return;
     }
 /*
     if (a_slice.m_row1 == a_slice.m_row2)
