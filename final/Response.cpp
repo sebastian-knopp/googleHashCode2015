@@ -50,15 +50,17 @@ void Response::calcSlice(const Slice a_slice)
         return;
     }
 
+    if (a_slice.m_row1 == a_slice.m_row2)
+        return;
+    if (a_slice.m_column1 == a_slice.m_column2)
+        return;
+
     Slice s1 = a_slice;
     Slice s2 = a_slice;
 
     size_t splitRow = (a_slice.m_row2 + a_slice.m_row1) / 2;
     s1.m_row2 = splitRow;
     s2.m_row1 = splitRow + 1;
-
-    if (a_slice.m_row1 == a_slice.m_row2)
-        return;
 
     Slice s3 = s1;
     Slice s4 = s2;
@@ -69,18 +71,7 @@ void Response::calcSlice(const Slice a_slice)
     s1.m_column2 = splitColumn;
     s2.m_column2 = splitColumn;
 
-    if (a_slice.m_column1 == a_slice.m_column2)
-        return;
-/*
-    if (s1.m_row2 < s2.m_row1)
-        return;
-    if (s3.m_row2 < s4.m_row1)
-        return;
-    if (s1.m_column2 < s3.m_column1)
-        return;
-    if (s2.m_column2 < s4.m_column1)
-        return;
-*/
+
     ASSERT(s1.m_row2 < s2.m_row1);
     ASSERT(s3.m_row2 < s4.m_row1);
     ASSERT(s1.m_column2 < s3.m_column1);
