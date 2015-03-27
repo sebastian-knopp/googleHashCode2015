@@ -1,6 +1,8 @@
 #pragma once
 #include <istream>
 #include <vector>
+#include "Assertion.h"
+
 
 enum class Taste
 {
@@ -18,6 +20,16 @@ public:
 
     Request();
 
+    size_t getNmbColumns() const
+    {
+        return m_pizza.size();
+    }
+
+    size_t getNmbRows() const
+    {
+        ASSERT(!m_pizza.empty());
+        return m_pizza[0].size();
+    }
 
 public:
 
@@ -34,5 +46,7 @@ public:
 std::istream& operator>>(std::istream& a_is, Request& a_request);
 
 std::ostream& operator<<(std::ostream& a_is, const Request& a_request);
+
+std::ostream& operator<<(std::ostream& a_is, const Taste& a_taste);
 
 
