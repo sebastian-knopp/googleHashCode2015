@@ -85,9 +85,24 @@ void Response::calcSlice(const Slice a_slice)
 */
     //std::cout << "c " << count << std::endl;
 
+
     if (width > height)
     {
         size_t splitRow = (a_slice.m_row2 + a_slice.m_row1) / 2;
+
+        size_t nmbHam = m_request->getNmbHam(a_slice);
+        size_t countHam = 0;
+        for (splitRow = 0; splitRow < m_request->getNmbRows(); ++splitRow)
+        {
+            Slice t = a_slice;
+            t.m_row1 = splitRow;
+            t.m_row2 = splitRow;
+            countHam += m_request->getNmbHam(t);
+            if (countHam > nmbHam / 2)
+                break;
+        }
+
+
         //std::cout << "sr " << splitRow << std::endl;
 
         s1.m_row2 = splitRow;
