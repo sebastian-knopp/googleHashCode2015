@@ -32,6 +32,9 @@ void Response::solve()
 
 void Response::calcSlice(const Slice a_slice)
 {
+    std::cout << "s: " << a_slice << std::endl;
+//    std::cout << "ham: " << m_request->getNmbHam(a_slice) << std::endl;
+//    std::cout << "minham: " << m_request->minNmbHam << std::endl;
     if (m_request->getNmbHam(a_slice) < m_request->minNmbHam)
         return;
 
@@ -41,92 +44,39 @@ void Response::calcSlice(const Slice a_slice)
         return;
     }
 
-    /*
-    if (a_slice.m_column1 > a_slice.m_column2)
-    {
-        std::cout << "c1>c2" << std::endl;
-        return;
-    }
-*/
-    if (a_slice.m_column2 >= m_request->getNmbColumns())
-    {
-        std::cout << "c2>n" << std::endl;
-        return;
-    }
-    if (a_slice.m_row1 > a_slice.m_row2)
-    {
-        std::cout << "r1>r2" << std::endl;
-        return;
-    }
-    if (a_slice.m_row2 >= m_request->getNmbRows())
-    {
-        std::cout << "r2>n" << std::endl;
-        return;
-    }
-
-
-/*
-    if (a_slice.m_row1 == a_slice.m_row2)
-        return;
-    if (a_slice.m_column1 == a_slice.m_column2)
-        return;
-*/
     size_t width = a_slice.m_row2 - a_slice.m_row1 + 1;
     size_t height = a_slice.m_column2 - a_slice.m_column1 + 1;
 
-    Slice s1 = a_slice;
-    Slice s2 = a_slice;
+    Slice first = a_slice;
+    Slice second = a_slice;
 
-    static size_t count = 0;
-    ++count;
-    /*
-    if (count > 99)
-        throw "end";
-*/
-    //std::cout << "c " << count << std::endl;
-
-
-    if (width > height)
+    const size_t* beginOrig = &a_slice.m_row1;
+    const size_t* endOrig = &a_slice.m_row2;
+    size_t* endOfFirst = &first.m_row2;
+    size_t* beginOfSecond = &second.m_row1;
+    if (height > width)
     {
-        size_t splitRow = (a_slice.m_row2 + a_slice.m_row1) / 2;
-
-        size_t nmbHam = m_request->getNmbHam(a_slice);
-        size_t countHam = 0;
-        for (splitRow = 0; splitRow < m_request->getNmbRows(); ++splitRow)
-        {
-            Slice t = a_slice;
-            t.m_row1 = splitRow;
-            t.m_row2 = splitRow;
-            countHam += m_request->getNmbHam(t);
-            if (countHam > nmbHam / 2)
-                break;
-        }
-
-
-        //std::cout << "sr " << splitRow << std::endl;
-
-        s1.m_row2 = splitRow;
-
-        if (s1.m_row2 != a_slice.m_row2)
-            calcSlice(s1);
-
-        s2.m_row1 = splitRow + 1;
-
-        if (s2.m_row1 < m_request->getNmbRows())
-            calcSlice(s2);
+        beginOrig = &a_slice.m_column1;
+        endOrig = &a_slice.m_column2;
+        endOfFirst = &first.m_column2;
+        beginOfSecond = &second.m_column1;
     }
-    else
-    {
-        size_t splitColumn = (a_slice.m_column2 + a_slice.m_column1) / 2;
-        s1.m_column2 = splitColumn;
 
-        if (s1.m_column2 != a_slice.m_column2)
-            calcSlice(s1);
+    size_t split = (*beginOrig + *endOrig) / 2;
+    *endOfFirst = split;
 
-        s2.m_column1 = splitColumn + 1;
-        if (s2.m_column1 < m_request->getNmbColumns())
-            calcSlice(s2);
-    }
+    if (*endOfFirst >= *endOrig)
+        return;
+
+    static  int c = 0;
+    ++c;
+    std::cout << c << std::endl;
+
+    calcSlice(first);
+
+    *beginOfSecond = split + 1;
+    if (*beginOfSecond <= *endOrig)
+        calcSlice(second);
 }
 
 
@@ -134,11 +84,16 @@ void Response::visualize() const
 {
     SVGWriter writer("visualize.html", 800, 30);
 
-    writer.drawCircle(5, 12, 1, 20);
-    writer.drawCircle(300, 12, 2, 20);
-
-    writer.drawText(20, 10, "Google Hash 2015 - Final", 20);
-    writer.drawText(20, 18, "Team: A211 - Mines Saint-Etienne - Gardanne - SFL", 14);
+    for (size_t c = 0; c < m_request->getNmbColumns(); ++c)
+    {
+        for (size_t r = 0; r < m_request->getNmbRows(); ++r)
+        {
+            if (m_request->m_pizza[c][r] == Taste::Ham)
+                writer.drawRectangle(c, r, c+1, r+1, 0);
+            else
+                writer.drawRectangle(c, r, c+1, r+1, 1);
+        }
+    }
 
 }
 
