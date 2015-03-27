@@ -33,13 +33,25 @@ void Response::solve()
 void Response::calcSlice(const Slice a_slice)
 {
     if (a_slice.m_column1 > a_slice.m_column2)
+    {
+        std::cout << "c1>c2" << std::endl;
         return;
+    }
     if (a_slice.m_column2 >= m_request->getNmbColumns())
+    {
+        std::cout << "c2>n" << std::endl;
         return;
+    }
     if (a_slice.m_row1 > a_slice.m_row2)
+    {
+        std::cout << "r1>r2" << std::endl;
         return;
+    }
     if (a_slice.m_row2 >= m_request->getNmbRows())
+    {
+        std::cout << "r2>n" << std::endl;
         return;
+    }
 
     if (a_slice.getNmbCells() <= m_request->maxNmbCells)
     {
@@ -47,7 +59,8 @@ void Response::calcSlice(const Slice a_slice)
         {
             m_slices.push_back(a_slice);
         }
-        return;
+        //std::cout << "m" << std::endl;
+        //return;
     }
 
     if (a_slice.m_row1 == a_slice.m_row2)
@@ -66,6 +79,7 @@ void Response::calcSlice(const Slice a_slice)
         size_t splitRow = (a_slice.m_row2 + a_slice.m_row1) / 2;
         s1.m_row2 = splitRow;
         s2.m_row1 = splitRow + 1;
+//        std::cout << "w" << std::endl;
         calcSlice(s1);
         calcSlice(s2);
     }
@@ -74,6 +88,7 @@ void Response::calcSlice(const Slice a_slice)
         size_t splitColumn = (a_slice.m_column2 + a_slice.m_column1) / 2;
         s1.m_column2 = splitColumn;
         s2.m_column1 = splitColumn + 1;
+//        std::cout << "h" << std::endl;
         calcSlice(s1);
         calcSlice(s2);
     }

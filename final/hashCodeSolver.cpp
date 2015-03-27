@@ -12,7 +12,7 @@ int solve(int, char* [])
         throw "Cannot open file.";
 
     ifs >> request;
-    std::cout << request << std::endl;
+    //std::cout << request << std::endl;
 
     Response resp(request);
 
