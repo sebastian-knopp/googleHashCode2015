@@ -108,6 +108,10 @@ void Response::visualize() const
         }
     }
 
+    for (const Slice& s : m_slices)
+    {
+        writer.drawRectangle(s.m_column1, s.m_row1, s.m_column2+1, s.m_row2+1, 7, 1);
+    }
 }
 
 
