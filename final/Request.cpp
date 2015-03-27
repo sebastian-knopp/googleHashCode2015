@@ -6,6 +6,21 @@ Request::Request()
 }
 
 
+size_t Request::getNmbHam(const Slice& a_slice) const
+{
+    size_t nmbHam = 0;
+    for (size_t c = a_slice.m_column1; c <= a_slice.m_column2; ++c)
+    {
+        for (size_t r = a_slice.m_row1; r <= a_slice.m_row2; ++r)
+        {
+            if (m_pizza[c][r] == Taste::Ham)
+                ++nmbHam;
+        }
+    }
+    return nmbHam;
+}
+
+
 std::istream& operator>>(std::istream& a_is, Request& a_request)
 {
     size_t nmbRows = 0;

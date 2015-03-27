@@ -2,6 +2,7 @@
 #include <istream>
 #include <vector>
 #include "Assertion.h"
+#include "Slice.h"
 
 
 enum class Taste
@@ -30,6 +31,8 @@ public:
         ASSERT(!m_pizza.empty());
         return m_pizza[0].size();
     }
+
+    size_t getNmbHam(const Slice& a_slice) const;
 
 public:
 

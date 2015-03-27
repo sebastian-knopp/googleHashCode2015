@@ -12,8 +12,18 @@ Response::Response(const Request& a_request)
 
 void Response::solve()
 {
-    //m_result = m_request->m_test * m_request->m_test;
-    //ASSERT(m_result == 42 * 42);
+    Slice s = { 0, 0, 1, 1};
+    //std::cout << *m_request << std::endl;
+    std::cout << "nmbham " << m_request->getNmbHam(s) << std::endl;
+    /*
+    for (size_t r = 0; r < nmbRows; ++r)
+    {
+        for (size_t c = 0; c < nmbColumns; ++c)
+        {
+
+        }
+    }
+    */
 }
 
 

@@ -1,15 +1,7 @@
 #pragma once
 #include <ostream>
 #include <vector>
-
-
-struct Slice
-{
-    size_t m_row1;
-    size_t m_row2;
-    size_t m_column1;
-    size_t m_column2;
-};
+#include "Slice.h"
 
 
 class Request;
