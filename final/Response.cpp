@@ -32,6 +32,15 @@ void Response::solve()
 
 void Response::calcSlice(const Slice a_slice)
 {
+    if (a_slice.m_column1 > a_slice.m_column2)
+        return;
+    if (a_slice.m_column2 >= m_request->getNmbColumns())
+        return;
+    if (a_slice.m_row1 > a_slice.m_row2)
+        return;
+    if (a_slice.m_row2 >= m_request->getNmbRows())
+        return;
+
     if (a_slice.getNmbCells() <= m_request->maxNmbCells)
     {
         if (m_request->getNmbHam(a_slice) >= m_request->minNmbHam)
@@ -47,6 +56,10 @@ void Response::calcSlice(const Slice a_slice)
     size_t splitRow = (a_slice.m_row2 + a_slice.m_row1) / 2;
     s1.m_row2 = splitRow;
     s2.m_row1 = splitRow + 1;
+
+    if (a_slice.m_row1 == a_slice.m_row2)
+        return;
+
     calcSlice(s1);
     calcSlice(s2);
 }
