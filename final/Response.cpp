@@ -32,11 +32,22 @@ void Response::solve()
 
 void Response::calcSlice(const Slice a_slice)
 {
+    if (m_request->getNmbHam(a_slice) < m_request->minNmbHam)
+        return;
+
+    if (a_slice.getNmbCells() <= m_request->maxNmbCells)
+    {
+        m_slices.push_back(a_slice);
+        return;
+    }
+
+    /*
     if (a_slice.m_column1 > a_slice.m_column2)
     {
         std::cout << "c1>c2" << std::endl;
         return;
     }
+*/
     if (a_slice.m_column2 >= m_request->getNmbColumns())
     {
         std::cout << "c2>n" << std::endl;
@@ -53,30 +64,32 @@ void Response::calcSlice(const Slice a_slice)
         return;
     }
 
-    if (a_slice.getNmbCells() <= m_request->maxNmbCells)
-    {
-        if (m_request->getNmbHam(a_slice) >= m_request->minNmbHam)
-        {
-            m_slices.push_back(a_slice);
-        }
-        //std::cout << "m" << std::endl;
-        return;
-    }
+
 /*
     if (a_slice.m_row1 == a_slice.m_row2)
         return;
     if (a_slice.m_column1 == a_slice.m_column2)
         return;
 */
-    size_t width = a_slice.m_row2 - a_slice.m_row1;
-    size_t height = a_slice.m_column2 - a_slice.m_row1;
+    size_t width = a_slice.m_row2 - a_slice.m_row1 + 1;
+    size_t height = a_slice.m_column2 - a_slice.m_column1 + 1;
 
     Slice s1 = a_slice;
     Slice s2 = a_slice;
 
+    static size_t count = 0;
+    ++count;
+    /*
+    if (count > 99)
+        throw "end";
+*/
+    //std::cout << "c " << count << std::endl;
+
     if (width > height)
     {
         size_t splitRow = (a_slice.m_row2 + a_slice.m_row1) / 2;
+        //std::cout << "sr " << splitRow << std::endl;
+
         s1.m_row2 = splitRow;
 
         if (s1.m_row2 != a_slice.m_row2)
@@ -89,8 +102,7 @@ void Response::calcSlice(const Slice a_slice)
     }
     else
     {
-        size_t columnSum = a_slice.m_column2 + a_slice.m_column1;
-        size_t splitColumn = columnSum / 2;
+        size_t splitColumn = (a_slice.m_column2 + a_slice.m_column1) / 2;
         s1.m_column2 = splitColumn;
 
         if (s1.m_column2 != a_slice.m_column2)
