@@ -17,6 +17,8 @@ public:
 
     void solve();
 
+    void calcSlice(const Slice a_slice);
+
     void visualize() const;
 
 
