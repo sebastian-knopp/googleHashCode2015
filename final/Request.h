@@ -34,6 +34,7 @@ public:
 
     size_t getNmbHam(const Slice& a_slice) const;
 
+
 public:
 
     Pizza m_pizza;

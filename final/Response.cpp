@@ -15,6 +15,7 @@ void Response::solve()
     Slice s = { 0, 0, 1, 1};
     //std::cout << *m_request << std::endl;
     std::cout << "nmbham " << m_request->getNmbHam(s) << std::endl;
+    std::cout << "cells " << s.getNmbCells() << std::endl;
     /*
     for (size_t r = 0; r < nmbRows; ++r)
     {
