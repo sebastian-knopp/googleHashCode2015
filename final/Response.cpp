@@ -46,14 +46,14 @@ void Response::solve()
 
     const std::vector<Coordinate> targets = getBalloonTargets();
 
-    int nmbBallons = 1; // m_request->m_nmbBallons;
+    int nmbBallons = m_request->m_nmbBallons;
     for (int b = 0; b != nmbBallons; ++b)
     {
         Coordinate target;
         //target.m_row = 27; //m_request->m_startCell.m_row + 1;
         //target.m_column = 169; //m_request->m_startCell.m_column + 1;
 
-        target = reachableTargets[b * 5 % reachableTargets.size()];
+        target = reachableTargets[(b * 3513 + 99) % reachableTargets.size()];
 /*
         std::cout << "t row: " << target.m_row << std::endl;
         std::cout << "t col: " << target.m_column << std::endl;
@@ -118,7 +118,7 @@ std::ostream& operator<<(std::ostream& a_os, const Response& a_response)
 /**/
 std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
 {
-    /*
+
     std::cout << "a_from row: " << a_from.m_row << std::endl;
     std::cout << "a_from col: " << a_from.m_column << std::endl;
     std::cout << "a_from alt: " << a_from.m_alt << std::endl;
@@ -126,7 +126,7 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
     std::cout << "a_to row: " << a_to.m_row << std::endl;
     std::cout << "a_to col: " << a_to.m_column << std::endl;
     std::cout << "a_to alt: " << a_to.m_alt << std::endl;
-*/
+
     if (a_from.m_row == a_to.m_row &&
         a_from.m_column == a_to.m_column)
     {
