@@ -2,7 +2,7 @@
 #include "Request.h"
 #include "SVGWriter.h"
 #include "Assertion.h"
-
+#include <queue>
 
 Response::Response(const Request& a_request)
 : m_request(&a_request)
@@ -52,7 +52,7 @@ std::ostream& operator<<(std::ostream& a_os, const Response& a_response)
 
 
 /**/
-std::vector<int> Result::getShortestPath(Coordinate a_from, Coordinate a_to)
+std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
 {
     if (a_from == a_to)
         return std::vector<int>();
@@ -77,14 +77,9 @@ std::vector<int> Result::getShortestPath(Coordinate a_from, Coordinate a_to)
 
 
     std::vector<Grid<NodeInfo>> info(m_request->m_nmbAltitudes,
-                                     Grid<Vector>(m_request->m_nmbRows, m_request->m_nmbColumns));
+                                     Grid<NodeInfo>(m_request->m_nmbRows, m_request->m_nmbColumns));
 
-    auto getNodeInfo = [&] (const Coordinate& a_coord)
-    {
-            return info[a_coord.m_alt](a_coord.m_row,a_coord.m_column);
-    };
-
-    getNodeInfo(a_from).m_cost = 0;
+    info[a_from.m_alt](a_from.m_row, a_from.m_column).m_cost = 0;
 
     std::priority_queue<PQEntry> q;
 
@@ -96,28 +91,32 @@ std::vector<int> Result::getShortestPath(Coordinate a_from, Coordinate a_to)
             break;
 
         q.pop();
-        if (getNodeInfo(currenQE.m_nodeIndex).m_cost < currentQE.m_cost)
+        auto& currentNode = info[currentQE.m_nodeIndex.m_alt](currentQE.m_nodeIndex.m_row, currentQE.m_nodeIndex.m_column);
+        if (currentNode.m_cost < currentQE.m_cost)
             continue; // node already settled
 
         std::vector<int> neighbours;
+        neighbours.reserve(3);
         neighbours.push_back(0);
-        if(currentQE.m_alt>1)
+
+        if (currentQE.m_nodeIndex.m_alt > 1)
             neighbours.push_back(-1);
-        if(currentQE.m_alt<m_request.m_nmbAltitudes)
+        if (currentQE.m_nodeIndex.m_alt < m_request->m_nmbAltitudes - 1)
             neighbours.push_back(1);
 
-        for (size_t s : neighbours)
+        for (int s : neighbours)
         {
-            const Street str = m_request->m_streets[s];
-            const int costWhenUsingThisStreet = info[currentJunction.m_nodeIndex].m_cost + getStreetCost(currentJunction.m_nodeIndex, s);
-
-            const size_t oppositeJunction = str.getOppositeJunction(currentJunction.m_nodeIndex);
-            if (costWhenUsingThisStreet < info[oppositeJunction].m_cost)
+            const int costWhenUsingThisNeighbor = currentNode.m_cost + 1;
+            Coordinate neighborCoord = currenQE.m_nodeIndex;
+            //neighborCoord.m_row = m_request;
+/*
+            if (costWhenUsingThisNeighbor < info[oppositeJunction].m_cost)
             {
                 info[oppositeJunction].m_predIndex = currentJunction.m_nodeIndex;
-                info[oppositeJunction].m_cost = costWhenUsingThisStreet;
+                info[oppositeJunction].m_cost = costWhenUsingThisNeighbor;
                 q.push( PQEntry { info[oppositeJunction].m_cost, oppositeJunction });
             }
+*/
         }
     }
 
