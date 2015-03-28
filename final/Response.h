@@ -1,8 +1,6 @@
 #pragma once
 #include <ostream>
-
-
-class Request;
+#include "Request.h"
 
 
 class Response {
@@ -20,9 +18,9 @@ public:
 
 private:
 
-    int m_result = 0;
-
     const Request* m_request;
+
+    std::vector<std::vector<size_t>> m_altitudeMoves;
 
 };
 

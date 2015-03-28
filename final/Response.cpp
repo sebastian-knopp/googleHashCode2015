@@ -6,6 +6,7 @@
 
 Response::Response(const Request& a_request)
 : m_request(&a_request)
+, m_altitudeMoves(m_request->m_nmbTurns, std::vector<size_t>(m_request->m_nmbBallons, 0))
 {
 }
 
@@ -32,7 +33,18 @@ void Response::visualize() const
 
 std::ostream& operator<<(std::ostream& a_os, const Response& a_response)
 {
-    a_os << a_response.m_result;
+    bool initial = true;
+    for (size_t t = 0; t != a_response.m_request->m_nmbTurns; ++t)
+    {
+        if (!initial)
+            a_os << "\n";
+
+        for (size_t b = 0; b != a_response.m_request->m_nmbBallons; ++b)
+        {
+            a_os << a_response.m_altitudeMoves[t][b] << " ";
+        }
+        initial = false;
+    }
     return a_os;
 }
 
