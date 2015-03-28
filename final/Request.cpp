@@ -21,7 +21,7 @@ std::istream& operator>>(std::istream& a_is, Request& a_request)
     a_is >> a_request.m_startCell.m_column;
 
     a_request.m_targetCells.reserve(a_request.m_nmbTargetCells);
-    for (size_t t = 0; t != a_request.m_nmbTargetCells; ++t)
+    for (int t = 0; t != a_request.m_nmbTargetCells; ++t)
     {
         Coordinate coord = {0, 0, 0};
         a_is >> coord.m_row;
@@ -32,11 +32,11 @@ std::istream& operator>>(std::istream& a_is, Request& a_request)
     a_request.m_windVectors.resize(a_request.m_nmbAltitudes,
                                    Grid<Vector>(a_request.m_nmbRows, a_request.m_nmbColumns));
 
-    for (size_t a = 0; a != a_request.m_nmbAltitudes; ++a)
+    for (int a = 0; a != a_request.m_nmbAltitudes; ++a)
     {
-        for (size_t r = 0; r != a_request.m_nmbRows; ++r)
+        for (int r = 0; r != a_request.m_nmbRows; ++r)
         {
-            for (size_t c = 0; c != a_request.m_nmbColumns; ++c)
+            for (int c = 0; c != a_request.m_nmbColumns; ++c)
             {
                 a_is >> a_request.m_windVectors[a](r, c).m_rowDiff;
                 a_is >> a_request.m_windVectors[a](r, c).m_columnDiff;

@@ -3,6 +3,8 @@
 #include "SVGWriter.h"
 #include "Assertion.h"
 #include <queue>
+#include <algorithm>
+
 
 Response::Response(const Request& a_request)
 : m_request(&a_request)
@@ -61,7 +63,7 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
     {
         int m_cost = std::numeric_limits<int>::max();
         Coordinate m_predIndex;
-        bool m_isValid=false;
+        bool m_isValid = true;
     };
 
     struct PQEntry
@@ -80,6 +82,7 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
                                      Grid<NodeInfo>(m_request->m_nmbRows, m_request->m_nmbColumns));
 
     info[a_from.m_alt](a_from.m_row, a_from.m_column).m_cost = 0;
+    info[a_from.m_alt](a_from.m_row, a_from.m_column).m_isValid = false;
 
     std::priority_queue<PQEntry> q;
 
@@ -117,32 +120,37 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
             if (neighborCoord.m_row < 0 || neighborCoord.m_row >= m_request->m_nmbRows)
                 continue;
 
-            auto& oppositeNode = info[neighborCoord.m_alt](neighborCoord.m_row, neighborCoord.m_column);
+            NodeInfo& oppositeNode = info[neighborCoord.m_alt](neighborCoord.m_row, neighborCoord.m_column);
             if (costWhenUsingThisNeighbor < oppositeNode.m_cost)
             {
                 oppositeNode.m_predIndex = currentQE.m_nodeIndex;
                 oppositeNode.m_cost = costWhenUsingThisNeighbor;
-                q.push( PQEntry { oppositeNode.m_cost, oppositeNode });
+                q.push( PQEntry { oppositeNode.m_cost, neighborCoord });
             }
 
         }
     }
 
-    std::vector<size_t> result;
-    size_t currentQE = a_toJunction;
-    while (currentQE != std::numeric_limits<size_t>::max())
+    std::vector<int> result;
+    Coordinate currentQE = a_to;
+    int currentAlt = currentQE.m_alt;
+    while (info[currentQE.m_alt](currentQE.m_row, currentQE.m_column).m_isValid)
     {
-        result.push_back(currentQE);
-        currentQE = info[currentQE].m_predIndex;
+        currentQE = info[currentQE.m_alt](currentQE.m_row, currentQE.m_column).m_predIndex;
+        result.push_back(currentAlt - currentQE.m_alt);
+        currentAlt =currentQE.m_alt;
     }
 
-    if (result.back() != a_from)
+    if (info[a_to.m_alt](a_to.m_row, a_to.m_column).m_cost == std::numeric_limits<int>::max())
+    {
         result.empty(); // path not found
-    else
-        result.pop_back();
+    }
+//    else
+//        result.pop_back();
 
     std::reverse(begin(result), end(result));
     return result;
 }
+
 
 /**/
