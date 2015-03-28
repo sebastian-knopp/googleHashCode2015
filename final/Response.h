@@ -13,7 +13,7 @@ public:
 
     void solve();
 
-    void visualize() const;
+    void visualize();
 
     std::vector<int> getShortestPath(Coordinate a_from, Coordinate a_to);
 

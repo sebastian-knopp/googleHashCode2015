@@ -16,6 +16,14 @@ int solve(int, char* [])
 
     Response resp(request);
 
+    /**
+    int min=500;
+    for(int i=0;i<request.m_nmbTargetCells;++i)
+        if(request.m_targetCells[i].m_column <min)
+            min=request.m_targetCells[i].m_column;
+    std::cout<<"minimum col"<<min<<"\n";
+    **/
+
     resp.solve();
     resp.visualize();
 
