@@ -8,7 +8,7 @@
 
 Response::Response(const Request& a_request)
 : m_request(&a_request)
-, m_altitudeMoves(m_request->m_nmbTurns, std::vector<size_t>(m_request->m_nmbBallons, 0))
+, m_altitudeMoves(m_request->m_nmbTurns, std::vector<int>(m_request->m_nmbBallons, 0))
 , m_isReachable(m_request->m_nmbAltitudes, Grid<int>(m_request->m_nmbRows, m_request->m_nmbColumns))
 {
 }
@@ -29,10 +29,20 @@ void Response::solve()
             for (int c = 0; c != m_request->m_nmbColumns; ++c)
             {
                 if (m_isReachable[a](r, c) == 1)
-                    reachableTargets.push_back( Coordinate { c, r, a} );
+                {
+                    Coordinate coord { c, r, a};
+/*
+                    std::cout << "c row: " << coord.m_row << std::endl;
+                    std::cout << "c col: " << coord.m_column << std::endl;
+                    std::cout << "c alt: " << coord.m_alt << std::endl;
+*/
+                    reachableTargets.push_back(coord);
+                }
             }
         }
     }
+
+    std::cout << "Found " << reachableTargets.size() << " reachable targets" << std::endl;
 
     const std::vector<Coordinate> targets = getBalloonTargets();
 
@@ -43,13 +53,19 @@ void Response::solve()
         //target.m_row = 27; //m_request->m_startCell.m_row + 1;
         //target.m_column = 169; //m_request->m_startCell.m_column + 1;
 
-        target = reachableTargets[b * 117 % reachableTargets.size()];
+        target = reachableTargets[b * 5 % reachableTargets.size()];
+/*
+        std::cout << "t row: " << target.m_row << std::endl;
+        std::cout << "t col: " << target.m_column << std::endl;
+        std::cout << "t alt: " << target.m_alt << std::endl;
+*/
 //        target.m_row = b * 17 % m_request->m_nmbRows;
 //        target.m_column = b * 5 % m_request->m_nmbColumns;
 
         std::vector<int> path = getShortestPath(m_request->m_startCell, target);
         for (size_t i = 0; i != path.size(); ++i)
         {
+            std::cout << "add " << path[i] << std::endl;
             m_altitudeMoves[i][b] = path[i];
         }
     }

@@ -25,7 +25,7 @@ private:
 
     const Request* m_request;
 
-    std::vector<std::vector<size_t>> m_altitudeMoves;
+    std::vector<std::vector<int>> m_altitudeMoves;
 
     std::vector<Grid<int>> m_isReachable;
 
