@@ -19,7 +19,11 @@ void Response::solve()
 
     for (int b = 0; b != m_request->m_nmbBallons; ++b)
     {
-        Coordinate target = targets[b];
+        Coordinate target;
+        target.m_row = b * 17 % m_request->m_nmbRows;
+        target.m_column = b * 5 % m_request->m_nmbColumns;
+        target.m_alt = 5;
+
         std::vector<int> path = getShortestPath(m_request->m_startCell, target);
         for (size_t i = 0; i != path.size(); ++i)
         {
@@ -63,8 +67,11 @@ std::ostream& operator<<(std::ostream& a_os, const Response& a_response)
 /**/
 std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
 {
-    if (a_from == a_to)
+    if (a_from.m_row == a_from.m_row &&
+        a_to.m_column == a_to.m_column)
+    {
         return std::vector<int>();
+    }
 
     struct NodeInfo
     {
@@ -97,7 +104,8 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
     while (!q.empty())
     {
         const PQEntry currentQE = q.top();
-        if (currentQE.m_nodeIndex == a_to)
+        if (currentQE.m_nodeIndex.m_row == a_to.m_row &&
+            currentQE.m_nodeIndex.m_column == a_to.m_column)
             break;
 
         q.pop();
