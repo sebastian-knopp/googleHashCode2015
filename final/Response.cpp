@@ -184,7 +184,10 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
             int rowDiff = m_request->m_windVectors[currentQE.m_nodeIndex.m_alt + s](currentQE.m_nodeIndex.m_row, currentQE.m_nodeIndex.m_column).m_rowDiff;
             int columnDiff = m_request->m_windVectors[currentQE.m_nodeIndex.m_alt + s](currentQE.m_nodeIndex.m_row, currentQE.m_nodeIndex.m_column).m_columnDiff;
             neighborCoord.m_row += rowDiff;
-            neighborCoord.m_column += columnDiff % m_request->m_nmbColumns;
+            neighborCoord.m_column += columnDiff;
+            if (neighborCoord.m_column < 0)
+                neighborCoord.m_column += m_request->m_nmbColumns;
+            neighborCoord.m_column = (neighborCoord.m_column % m_request->m_nmbColumns);
 
             if (neighborCoord.m_row < 0 || neighborCoord.m_row >= m_request->m_nmbRows)
                 continue;
