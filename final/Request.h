@@ -12,16 +12,16 @@ struct Coordinate
                m_alt == a_other.m_alt;
     }
 
-    size_t m_column;
-    size_t m_row;
-    size_t m_alt;
+    int m_column;
+    int m_row;
+    int m_alt;
 };
 
 
 struct Vector
 {
-    size_t m_rowDiff;
-    size_t m_columnDiff;
+    int m_rowDiff;
+    int m_columnDiff;
 };
 
 
@@ -61,14 +61,14 @@ public:
 
 public:
 
-    size_t m_nmbRows = 0;
-    size_t m_nmbColumns = 0;
-    size_t m_nmbAltitudes = 0;
+    int m_nmbRows = 0;
+    int m_nmbColumns = 0;
+    int m_nmbAltitudes = 0;
 
-    size_t m_nmbTargetCells = 0;
-    size_t m_coverageRadius = 0;
-    size_t m_nmbBallons = 0;
-    size_t m_nmbTurns = 0;
+    int m_nmbTargetCells = 0;
+    int m_coverageRadius = 0;
+    int m_nmbBallons = 0;
+    int m_nmbTurns = 0;
 
     Coordinate m_startCell = { 0, 0, 0 };
 

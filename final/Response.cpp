@@ -13,7 +13,7 @@ Response::Response(const Request& a_request)
 
 void Response::solve()
 {
-    for (size_t b = 0; b != m_request->m_nmbBallons; ++b)
+    for (int b = 0; b != m_request->m_nmbBallons; ++b)
     {
         m_altitudeMoves[0][b] = 1;
     }
@@ -36,12 +36,12 @@ void Response::visualize() const
 std::ostream& operator<<(std::ostream& a_os, const Response& a_response)
 {
     bool initial = true;
-    for (size_t t = 0; t != a_response.m_request->m_nmbTurns; ++t)
+    for (int t = 0; t != a_response.m_request->m_nmbTurns; ++t)
     {
         if (!initial)
             a_os << "\n";
 
-        for (size_t b = 0; b != a_response.m_request->m_nmbBallons; ++b)
+        for (int b = 0; b != a_response.m_request->m_nmbBallons; ++b)
         {
             a_os << a_response.m_altitudeMoves[t][b] << " ";
         }
@@ -107,16 +107,24 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
         for (int s : neighbours)
         {
             const int costWhenUsingThisNeighbor = currentNode.m_cost + 1;
-            Coordinate neighborCoord = currenQE.m_nodeIndex;
-            //neighborCoord.m_row = m_request;
-/*
-            if (costWhenUsingThisNeighbor < info[oppositeJunction].m_cost)
+            Coordinate neighborCoord = currentQE.m_nodeIndex;
+
+            int rowDiff = m_request->m_windVectors[currentQE.m_nodeIndex.m_alt + s](currentQE.m_nodeIndex.m_row, currentQE.m_nodeIndex.m_column).m_rowDiff;
+            int columnDiff = m_request->m_windVectors[currentQE.m_nodeIndex.m_alt + s](currentQE.m_nodeIndex.m_row, currentQE.m_nodeIndex.m_column).m_columnDiff;
+            neighborCoord.m_row += rowDiff;
+            neighborCoord.m_column += columnDiff % m_request->m_nmbColumns;
+
+            if (neighborCoord.m_row < 0 || neighborCoord.m_row >= m_request->m_nmbRows)
+                continue;
+
+            auto& oppositeNode = info[neighborCoord.m_alt](neighborCoord.m_row, neighborCoord.m_column);
+            if (costWhenUsingThisNeighbor < oppositeNode.m_cost)
             {
-                info[oppositeJunction].m_predIndex = currentJunction.m_nodeIndex;
-                info[oppositeJunction].m_cost = costWhenUsingThisNeighbor;
-                q.push( PQEntry { info[oppositeJunction].m_cost, oppositeJunction });
+                oppositeNode.m_predIndex = currentQE.m_nodeIndex;
+                oppositeNode.m_cost = costWhenUsingThisNeighbor;
+                q.push( PQEntry { oppositeNode.m_cost, oppositeNode });
             }
-*/
+
         }
     }
 
