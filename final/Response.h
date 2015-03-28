@@ -13,7 +13,7 @@ public:
 
     void solve();
 
-    void visualize() const;
+    void visualize();
 
     std::vector<int> getShortestPath(Coordinate a_from, Coordinate a_to);
 
@@ -25,7 +25,7 @@ private:
 
     const Request* m_request;
 
-    std::vector<std::vector<size_t>> m_altitudeMoves;
+    std::vector<std::vector<int>> m_altitudeMoves;
 
 };
 

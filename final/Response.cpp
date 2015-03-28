@@ -4,25 +4,43 @@
 #include "Assertion.h"
 #include <queue>
 #include <algorithm>
+#include <ctime>
 
 
 Response::Response(const Request& a_request)
 : m_request(&a_request)
-, m_altitudeMoves(m_request->m_nmbTurns, std::vector<size_t>(m_request->m_nmbBallons, 0))
+, m_altitudeMoves(m_request->m_nmbTurns, std::vector<int>(m_request->m_nmbBallons, 0))
 {
 }
+
 
 
 void Response::solve()
 {
+    srand(time(NULL));
     for (int b = 0; b != m_request->m_nmbBallons; ++b)
     {
         m_altitudeMoves[0][b] = 1;
     }
+
+    for (int t = 1; t != m_request->m_nmbTurns; ++t){
+        int currentalt=1;
+        for (int b = 0; b != m_request->m_nmbBallons; ++b){
+            int dep=-1 + rand()%3;
+            currentalt+=dep;
+            m_altitudeMoves[t][b] = dep;
+            if(currentalt==0 || currentalt>m_request->m_nmbAltitudes){
+                m_altitudeMoves[t][b] = 0;
+                currentalt-=dep;
+            }
+        }
+
+    }
+
 }
 
 
-void Response::visualize() const
+void Response::visualize()
 {
     SVGWriter writer("visualize.html", 800, 30);
 
@@ -31,6 +49,14 @@ void Response::visualize() const
 
     writer.drawText(20, 10, "Google Hash 2015 - Final", 20);
     writer.drawText(20, 18, "Team: A211 - Mines Saint-Etienne - Gardanne - SFL", 14);
+
+
+    std::vector<Coordinate> targets = getBalloonTargets();
+    for(size_t i=0;i<targets.size();++i){ //Draws a 3 pixel diameter circle for each target
+        writer.drawCircle(targets[i].m_column,targets[i].m_row,1,3);
+        std::cout<<"("<<targets[i].m_row<<","<<targets[i].m_column<<")\n";
+    }
+
 
 }
 
@@ -153,10 +179,92 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
 }
 
 
+/**/
+
 std::vector<Coordinate> Response::getBalloonTargets()
 {
-    return std::vector<Coordinate>(m_request->m_nmbBallons);
+    std::vector<bool> isTaken(m_request->m_nmbTargetCells,false);
+
+    std::vector<Coordinate> targets(m_request->m_nmbBallons);
+    //For each ballon, we set a target.
+    for(int b=0;b<m_request->m_nmbBallons;++b){//South America
+        //One third is going to South America, one third to Africa, the remainings in Australia
+        if(b<m_request->m_nmbBallons/3){
+            //All the targets for which the column index is between 0 and 100
+            for(int tg=0;tg<m_request->m_nmbTargetCells;tg++){
+
+                int colonne = m_request->m_targetCells[tg].m_column;
+                if(colonne <=100){//Here, we are going to send one half to the north and the other one to the south
+                    int ligne = m_request->m_targetCells[tg].m_row;
+                    if(ligne<=37){//Improvement : compute the median row value
+                        if(b<m_request->m_nmbBallons/6 && isTaken[tg]==false){
+                            targets[b]=m_request->m_targetCells[tg];
+                            //std::cout<<"("<<targets[b].m_row<<","<<targets[b].m_column<<")\n";
+                            isTaken[tg]=true;
+                            break;
+                        }
+                    }
+                    else{
+                        if(b>=m_request->m_nmbBallons/6 && isTaken[tg]==false){
+                            targets[b]=m_request->m_targetCells[tg];
+                            isTaken[tg]=true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+        }
+        else if(b<2*m_request->m_nmbBallons/3){//Africa
+            //All the targets for which the column index is between 101 and 200
+
+            for(int tg=0;tg<m_request->m_nmbTargetCells;tg++){
+                int colonne = m_request->m_targetCells[tg].m_column;
+                if(colonne <=200){//Here, we are going to send one half to the north and the other one to the south
+                    int ligne = m_request->m_targetCells[tg].m_row;
+                    if(ligne<=10){//Improvement : compute the median row value
+                        if(b<m_request->m_nmbBallons/2 && isTaken[tg]==false){
+                            targets[b]=m_request->m_targetCells[tg];
+                            isTaken[tg]=true;
+                            break;
+                        }
+                    }
+                    else{
+                        if(b>=m_request->m_nmbBallons/2 && isTaken[tg]==false){
+                            targets[b]=m_request->m_targetCells[tg];
+                            isTaken[tg]=true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+        }
+        else{//All the targets for which the column index is between 201 and 300
+            for(int tg=0;tg<m_request->m_nmbTargetCells;tg++){//Australia
+                int colonne = m_request->m_targetCells[tg].m_column;
+                if(colonne <=300){//Here, we are going to send one half to the north and the other one to the south
+                    int ligne = m_request->m_targetCells[tg].m_row;
+                    if(ligne<=15){//Improvement : compute the median row value
+                        if(b<5*m_request->m_nmbBallons/6 && isTaken[tg]==false){
+                            targets[b]=m_request->m_targetCells[tg];
+                            isTaken[tg]=true;
+                            break;
+                        }
+                    }
+                    else{
+                        if(b>=5*m_request->m_nmbBallons/6 && isTaken[tg]==false){
+                            targets[b]=m_request->m_targetCells[tg];
+                            isTaken[tg]=true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+      }
+
+    return targets;
+
 }
 
-
-/**/
