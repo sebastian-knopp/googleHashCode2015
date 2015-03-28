@@ -7,7 +7,7 @@
 int solve(int, char* [])
 {
     Request request;
-    std::ifstream ifs("example.in");
+    std::ifstream ifs("final_round.in");
     if (!ifs)
         throw "Cannot open file.";
 

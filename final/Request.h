@@ -29,12 +29,12 @@ struct Grid
 
     const T& operator() (size_t a_row, size_t a_column) const
     {
-        return m_data[a_row + m_nmbColumns * a_column];
+        return m_data[a_row * m_nmbColumns + a_column];
     }
 
     T& operator() (size_t a_row, size_t a_column)
     {
-        return m_data[a_row + m_nmbColumns * a_column];
+        return m_data[a_row * m_nmbColumns + a_column];
     }
 
 
