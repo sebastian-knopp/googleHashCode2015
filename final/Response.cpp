@@ -153,4 +153,10 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
 }
 
 
+std::vector<Coordinate> Response::getBalloonTargets()
+{
+    return std::vector<Coordinate>(m_request->m_nmbBallons);
+}
+
+
 /**/

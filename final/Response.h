@@ -17,6 +17,9 @@ public:
 
     std::vector<int> getShortestPath(Coordinate a_from, Coordinate a_to);
 
+    //! Returns a vector with size == nmb Balloons
+    std::vector<Coordinate> getBalloonTargets();
+
 
 private:
 
