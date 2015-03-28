@@ -111,6 +111,7 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
     info[a_from.m_alt](a_from.m_row, a_from.m_column).m_isValid = false;
 
     std::priority_queue<PQEntry> q;
+    bool foundTarget = false;
 
     q.push( PQEntry { 0, a_from });
     while (!q.empty())
@@ -120,6 +121,7 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
             currentQE.m_nodeIndex.m_column == a_to.m_column)
         {
             a_to.m_alt = currentQE.m_nodeIndex.m_alt;
+            foundTarget = true;
             std::cout << "found target" << std::endl;
             break;
         }
@@ -179,6 +181,12 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
     }
 
     std::vector<int> result;
+    if (!foundTarget)
+    {
+        std::cout << "could not find target" << std::endl;
+        return result;
+    }
+
     Coordinate currentQE = a_to;
     int currentAlt = currentQE.m_alt;
     while (info[currentQE.m_alt](currentQE.m_row, currentQE.m_column).m_isValid)
