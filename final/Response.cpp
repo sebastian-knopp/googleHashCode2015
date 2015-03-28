@@ -26,15 +26,15 @@ void Response::solve()
     getShortestPath(m_request->m_startCell, unreachable, false);
 
     std::vector<Coordinate> reachableTargets;
-    for (int a = 0; a != m_request->m_nmbAltitudes; ++a)
+    for (int a = 4; a != 5 /*m_request->m_nmbAltitudes*/; ++a)
     {
         std::cout << "AAAAAAAAAAAA" << a << std::endl;
         for (int r = 0; r != m_request->m_nmbRows; ++r)
         {
-            std::cout << "r " << reachableTargets.size() << std::endl;
+            std::cout << "r " << r << " t " << reachableTargets.size() << std::endl;
             for (int c = 0; c != m_request->m_nmbColumns; ++c)
             {
-                if (m_isReachable[a](r, c) == 1)
+                if (m_isReachable[a](r, c) == 1 && (r %5 == 0))
                 {
                     Coordinate coord { c, r, a};
 
@@ -75,42 +75,42 @@ void Response::solve()
     {
         int turnIndex = 0;
         Coordinate start = m_request->m_startCell;
-        while (turnIndex < m_request->m_nmbTurns)
+
+        ++r;
+        Coordinate target;
+        target = reachableTargets[(r * 3513 + 99) % reachableTargets.size()];
+        for (int a = 0; a != m_request->m_nmbAltitudes; ++a)
         {
-            ++r;
-            Coordinate target;
-            target = reachableTargets[(r * 3513 + 99) % reachableTargets.size()];
-            for (int a = 0; a != m_request->m_nmbAltitudes; ++a)
+            if (m_isReachable[a](targets[b].m_row, targets[b].m_column) == 1)
             {
-                if (m_isReachable[a](targets[b].m_row, targets[b].m_column) == 1)
-                {
-                    //std::cout << "use reachable target" << std::endl;
-                    target = targets[b];
-                    target.m_alt = a;
-                    break;
-                }
-                else
-                {
-                    //std::cout << "use random target" << std::endl;
-                }
-            }
-            std::vector<int> path = getShortestPath(start, target, true);
-            if (path.empty())
-            {
+                //std::cout << "use reachable target" << std::endl;
+                target = targets[b];
+                target.m_alt = a;
                 break;
             }
-
-            for (int p = 0; p < static_cast<int>(path.size()); ++p)
+            else
             {
-                if (turnIndex+p >= m_request->m_nmbTurns)
-                    break;
-
-                m_altitudeMoves[turnIndex+p][b] = path[p];
+                //std::cout << "use random target" << std::endl;
             }
-            turnIndex += path.size();
-            start = target;
         }
+        std::vector<int> path = getShortestPath(start, target, true);
 
+        for (int p = 0; p < static_cast<int>(path.size()); ++p)
+        {
+            if (turnIndex+p >= m_request->m_nmbTurns)
+                break;
+
+            m_altitudeMoves[turnIndex+p][b] = path[p];
+        }
+/*
+        int fullCycleIndex = 0;
+        for (; turnIndex != m_request->m_nmbTurns; ++turnIndex)
+        {
+            m_altitudeMoves[turnIndex][b] = fullCycle[fullCycleIndex % fullCycle.size()];
+            ++fullCycleIndex;
+            //std::cout << "m " << fullCycle[fullCycleIndex] << std::endl;
+        }
+*/
     }
 }
 
@@ -393,6 +393,7 @@ std::vector<int> Response::findSelfLoop(const Coordinate a_coord)
 {
     Coordinate from1 = a_coord;
 
+    //int m = 0;
     int rowDiff = m_request->m_windVectors[a_coord.m_alt](a_coord.m_row, a_coord.m_column).m_rowDiff;
     int columnDiff = m_request->m_windVectors[a_coord.m_alt](a_coord.m_row, a_coord.m_column).m_columnDiff;
 
@@ -406,7 +407,9 @@ std::vector<int> Response::findSelfLoop(const Coordinate a_coord)
     if (from1.m_row < 0 || from1.m_row >= m_request->m_nmbRows)
         return fullCycle;
 
-    std::vector<int> cycle = getShortestPath(from1, a_coord, true, 3);
+    std::vector<int> cycle = getShortestPath(from1, a_coord, true, 40);
+    if (cycle.empty())
+        return cycle;
     //std::cout << "cycle length: " << cycle.size() << std::endl;
 
     fullCycle.push_back(0);
