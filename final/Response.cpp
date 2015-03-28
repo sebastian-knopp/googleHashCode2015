@@ -8,17 +8,15 @@ Response::Response(const Request& a_request)
 : m_request(&a_request)
 , m_altitudeMoves(m_request->m_nmbTurns, std::vector<size_t>(m_request->m_nmbBallons, 0))
 {
-    for (size_t b = 0; b != m_request->m_nmbBallons; ++b)
-    {
-        m_altitudeMoves[0][b] = 1;
-    }
 }
 
 
 void Response::solve()
 {
-    //m_result = m_request->m_test * m_request->m_test;
-    //ASSERT(m_result == 42 * 42);
+    for (size_t b = 0; b != m_request->m_nmbBallons; ++b)
+    {
+        m_altitudeMoves[0][b] = 1;
+    }
 }
 
 
