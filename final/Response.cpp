@@ -104,36 +104,6 @@ void Response::solve()
             start = target;
         }
 
-/*
-        Coordinate from1 = target;
-
-        int rowDiff = m_request->m_windVectors[target.m_alt](target.m_row, target.m_column).m_rowDiff;
-        int columnDiff = m_request->m_windVectors[target.m_alt](target.m_row, target.m_column).m_columnDiff;
-
-        from1.m_row += rowDiff;
-        from1.m_column += columnDiff;
-        if (from1.m_column < 0)
-            from1.m_column += m_request->m_nmbColumns;
-        from1.m_column = (from1.m_column % m_request->m_nmbColumns);
-
-        std::vector<int> cycle = getShortestPath(from1, target, true);
-        std::cout << "cycle length: " << cycle.size() << std::endl;
-
-        std::vector<int> fullCycle;
-        fullCycle.push_back(0);
-        for (int m : cycle)
-        {
-            fullCycle.push_back(m);
-        }
-
-        int fullCycleIndex = 0;
-        for (; turnIndex != m_request->m_nmbTurns; ++turnIndex)
-        {
-            m_altitudeMoves[turnIndex][b] = fullCycle[fullCycleIndex % fullCycle.size()];
-            ++fullCycleIndex;
-            //std::cout << "m " << fullCycle[fullCycleIndex] << std::endl;
-        }
-*/
     }
 }
 
@@ -188,7 +158,7 @@ std::ostream& operator<<(std::ostream& a_os, const Response& a_response)
 
 
 /**/
-std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to, bool a_checkAltitude)
+std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to, bool a_checkAltitude, int a_maxCost)
 {
     if (a_from.m_row == a_to.m_row &&
         a_from.m_column == a_to.m_column)
@@ -228,6 +198,8 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to, b
     while (!q.empty())
     {
         const PQEntry currentQE = q.top();
+        if (currentQE.m_cost > a_maxCost)
+            break;
 
         m_isReachable[currentQE.m_nodeIndex.m_alt](currentQE.m_nodeIndex.m_row, currentQE.m_nodeIndex.m_column) = 1;
 
@@ -407,5 +379,32 @@ std::vector<Coordinate> Response::getBalloonTargets()
 
     return targets;
 
+}
+
+
+std::vector<int> Response::findSelfLoop(const Coordinate a_coord)
+{
+    Coordinate from1 = a_coord;
+
+    int rowDiff = m_request->m_windVectors[a_coord.m_alt](a_coord.m_row, a_coord.m_column).m_rowDiff;
+    int columnDiff = m_request->m_windVectors[a_coord.m_alt](a_coord.m_row, a_coord.m_column).m_columnDiff;
+
+    from1.m_row += rowDiff;
+    from1.m_column += columnDiff;
+    if (from1.m_column < 0)
+        from1.m_column += m_request->m_nmbColumns;
+    from1.m_column = (from1.m_column % m_request->m_nmbColumns);
+
+    std::vector<int> cycle = getShortestPath(from1, a_coord, true, 3);
+    std::cout << "cycle length: " << cycle.size() << std::endl;
+
+    std::vector<int> fullCycle;
+    fullCycle.push_back(0);
+    for (int m : cycle)
+    {
+        fullCycle.push_back(m);
+    }
+
+    return fullCycle;
 }
 

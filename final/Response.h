@@ -15,7 +15,7 @@ public:
 
     void visualize();
 
-    std::vector<int> getShortestPath(Coordinate a_from, Coordinate a_to, bool a_checkAltitude);
+    std::vector<int> getShortestPath(Coordinate a_from, Coordinate a_to, bool a_checkAltitude, int a_maxCost = 999);
 
     //! Returns a vector with size == nmb Balloons
     std::vector<Coordinate> getBalloonTargets();
