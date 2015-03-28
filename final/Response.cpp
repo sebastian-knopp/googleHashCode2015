@@ -36,7 +36,7 @@ void Response::solve()
 
     const std::vector<Coordinate> targets = getBalloonTargets();
 
-    int nmbBallons = m_request->m_nmbBallons;
+    int nmbBallons = 1; // m_request->m_nmbBallons;
     for (int b = 0; b != nmbBallons; ++b)
     {
         Coordinate target;
@@ -102,6 +102,7 @@ std::ostream& operator<<(std::ostream& a_os, const Response& a_response)
 /**/
 std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
 {
+    /*
     std::cout << "a_from row: " << a_from.m_row << std::endl;
     std::cout << "a_from col: " << a_from.m_column << std::endl;
     std::cout << "a_from alt: " << a_from.m_alt << std::endl;
@@ -109,7 +110,7 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
     std::cout << "a_to row: " << a_to.m_row << std::endl;
     std::cout << "a_to col: " << a_to.m_column << std::endl;
     std::cout << "a_to alt: " << a_to.m_alt << std::endl;
-
+*/
     if (a_from.m_row == a_to.m_row &&
         a_from.m_column == a_to.m_column)
     {
@@ -212,17 +213,19 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
             if (neighborCoord.m_row < 0 || neighborCoord.m_row >= m_request->m_nmbRows)
                 continue;
 
-            NodeInfo& oppositeNode = info[neighborCoord.m_alt](neighborCoord.m_row, neighborCoord.m_column);
-            if (costWhenUsingThisNeighbor < oppositeNode.m_cost)
+            neighborCoord.m_alt += s;
+
+            NodeInfo& neighborNode = info[neighborCoord.m_alt](neighborCoord.m_row, neighborCoord.m_column);
+            if (costWhenUsingThisNeighbor < neighborNode.m_cost)
             {
-                oppositeNode.m_predIndex = currentQE.m_nodeIndex;
-                oppositeNode.m_cost = costWhenUsingThisNeighbor;
+                neighborNode.m_predIndex = currentQE.m_nodeIndex;
+                neighborNode.m_cost = costWhenUsingThisNeighbor;
 /*
                 std::cout << "push row: " << neighborCoord.m_row << std::endl;
                 std::cout << "push col: " << neighborCoord.m_column << std::endl;
                 std::cout << "push alt: " << neighborCoord.m_alt << std::endl;
 */
-                q.push( PQEntry { oppositeNode.m_cost, neighborCoord });
+                q.push( PQEntry { neighborNode.m_cost, neighborCoord });
             }
 
         }
@@ -240,8 +243,16 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
     while (info[currentQE.m_alt](currentQE.m_row, currentQE.m_column).m_isValid)
     {
         currentQE = info[currentQE.m_alt](currentQE.m_row, currentQE.m_column).m_predIndex;
-        result.push_back(currentAlt - currentQE.m_alt);
+        int move = currentAlt - currentQE.m_alt;
+/*
+        std::cout << "m " << move << std::endl;
+        std::cout << "m row: " << currentQE.m_row << std::endl;
+        std::cout << "m col: " << currentQE.m_column << std::endl;
+        std::cout << "m alt: " << currentQE.m_alt << std::endl;
+*/
+        result.push_back(move);
         currentAlt =currentQE.m_alt;
+
     }
 
     if (info[a_to.m_alt](a_to.m_row, a_to.m_column).m_cost == std::numeric_limits<int>::max())
