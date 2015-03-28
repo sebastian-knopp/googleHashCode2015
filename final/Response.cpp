@@ -28,9 +28,10 @@ void Response::solve()
     std::vector<Coordinate> reachableTargets;
     for (int a = 0; a != m_request->m_nmbAltitudes; ++a)
     {
+        std::cout << "AAAAAAAAAAAA" << a << std::endl;
         for (int r = 0; r != m_request->m_nmbRows; ++r)
         {
-            std::cout << "r " << r << std::endl;
+            std::cout << "r " << reachableTargets.size() << std::endl;
             for (int c = 0; c != m_request->m_nmbColumns; ++c)
             {
                 if (m_isReachable[a](r, c) == 1)
