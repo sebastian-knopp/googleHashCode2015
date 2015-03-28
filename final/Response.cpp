@@ -140,24 +140,31 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
             std::cout << "found target" << std::endl;
             break;
         }
-/*
-        {
-            static int count = 0;
-            ++count;
-            if (count < 100)
-            {
-                std::cout << "row: " << currentQE.m_nodeIndex.m_row << std::endl;
-                std::cout << "col: " << currentQE.m_nodeIndex.m_column << std::endl;
-                std::cout << "alt: " << currentQE.m_nodeIndex.m_alt << std::endl;
-            }
-        }
-*/
+
         q.pop();
         auto& currentNode = info[currentQE.m_nodeIndex.m_alt](currentQE.m_nodeIndex.m_row, currentQE.m_nodeIndex.m_column);
-        if (currentNode.m_cost < currentQE.m_cost)
+        ASSERT(currentNode.m_cost < 999999);
+        if (currentQE.m_cost > currentNode.m_cost)
         {
             std::cout << "stop on settled" << std::endl;
             continue; // node already settled
+        }
+
+        {
+            static int count = 0;
+            ++count;
+
+            //if (count < 100)
+            {
+                std::cout << "cost: " << currentQE.m_cost << std::endl;
+                std::cout << "row: " << currentQE.m_nodeIndex.m_row << std::endl;
+                std::cout << "col: " << currentQE.m_nodeIndex.m_column << std::endl;
+                std::cout << "alt: " << currentQE.m_nodeIndex.m_alt << std::endl;
+                std::cout << "valid: " << currentNode.m_isValid << std::endl;
+                std::cout << std::endl;
+            }
+
+            ASSERT(count == 1 || currentNode.m_isValid);
         }
 
         std::vector<int> neighbours;

@@ -1,6 +1,7 @@
 #pragma once
 #include <istream>
 #include <vector>
+#include "Assertion.h"
 
 
 struct Coordinate
@@ -37,11 +38,17 @@ struct Grid
 
     const T& operator() (size_t a_row, size_t a_column) const
     {
+        ASSERT(a_row * m_nmbColumns + a_column < m_data.size());
+        ASSERT(a_column < m_nmbColumns);
+        ASSERT(a_row < m_data.size() / m_nmbColumns);
         return m_data[a_row * m_nmbColumns + a_column];
     }
 
     T& operator() (size_t a_row, size_t a_column)
     {
+        ASSERT(a_row * m_nmbColumns + a_column < m_data.size());
+        ASSERT(a_column < m_nmbColumns);
+        ASSERT(a_row < m_data.size() / m_nmbColumns);
         return m_data[a_row * m_nmbColumns + a_column];
     }
 
