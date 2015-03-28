@@ -81,8 +81,8 @@ void Response::solve()
 
         std::vector<int> path = getShortestPath(m_request->m_startCell, target);
 
-        size_t turnIndex = 0;
-        for (turnIndex = 0; turnIndex != path.size(); ++turnIndex)
+        int turnIndex = 0;
+        for (turnIndex = 0; turnIndex != static_cast<int>(path.size()); ++turnIndex)
         {
             m_altitudeMoves[turnIndex][b] = path[turnIndex];
         }
@@ -110,10 +110,11 @@ void Response::solve()
         }
 
         int fullCycleIndex = 0;
-        for (; turnIndex != path.size(); ++turnIndex)
+        for (; turnIndex != m_request->m_nmbTurns; ++turnIndex)
         {
-            m_altitudeMoves[turnIndex][b] = fullCycle[fullCycleIndex];
+            m_altitudeMoves[turnIndex][b] = fullCycle[fullCycleIndex % fullCycle.size()];
             ++fullCycleIndex;
+            //std::cout << "m " << fullCycle[fullCycleIndex] << std::endl;
         }
     }
 }
