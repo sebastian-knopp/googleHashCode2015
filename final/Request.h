@@ -19,6 +19,6 @@ public:
 
 std::istream& operator>>(std::istream& a_is, Request& a_request);
 
-std::ostream& operator<<(std::ostream& a_is, const Request& a_request);
+std::ostream& operator<<(std::ostream& a_os, const Request& a_request);
 
 

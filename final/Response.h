@@ -27,5 +27,5 @@ private:
 };
 
 
-std::ostream& operator<<(std::ostream& a_is, const Response& a_request);
+std::ostream& operator<<(std::ostream& a_os, const Response& a_request);
 

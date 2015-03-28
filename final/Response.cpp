@@ -30,9 +30,9 @@ void Response::visualize() const
 }
 
 
-std::ostream& operator<<(std::ostream& a_is, const Response& a_response)
+std::ostream& operator<<(std::ostream& a_os, const Response& a_response)
 {
-    a_is << a_response.m_result;
-    return a_is;
+    a_os << a_response.m_result;
+    return a_os;
 }
 
