@@ -9,27 +9,41 @@
 Response::Response(const Request& a_request)
 : m_request(&a_request)
 , m_altitudeMoves(m_request->m_nmbTurns, std::vector<size_t>(m_request->m_nmbBallons, 0))
-, m_reachableCoordinates(m_request->m_nmbRows, m_request->m_nmbColumns)
+, m_isReachable(m_request->m_nmbAltitudes, Grid<int>(m_request->m_nmbRows, m_request->m_nmbColumns))
 {
 }
 
 
 void Response::solve()
 {
-    const std::vector<Coordinate> targets = getBalloonTargets();
-
     Coordinate unreachable;
     unreachable.m_row = m_request->m_startCell.m_row + 1;
     unreachable.m_column = m_request->m_startCell.m_column + 1;
     getShortestPath(m_request->m_startCell, unreachable);
 
-    int nmbBallons = 1; // m_request->m_nmbBallons;
+    std::vector<Coordinate> reachableTargets;
+    for (int a = 0; a != m_request->m_nmbAltitudes; ++a)
+    {
+        for (int r = 0; r != m_request->m_nmbRows; ++r)
+        {
+            for (int c = 0; c != m_request->m_nmbColumns; ++c)
+            {
+                if (m_isReachable[a](r, c) == 1)
+                    reachableTargets.push_back( Coordinate { c, r, a} );
+            }
+        }
+    }
+
+    const std::vector<Coordinate> targets = getBalloonTargets();
+
+    int nmbBallons = m_request->m_nmbBallons;
     for (int b = 0; b != nmbBallons; ++b)
     {
         Coordinate target;
-        target.m_row = 27; //m_request->m_startCell.m_row + 1;
-        target.m_column = 169; //m_request->m_startCell.m_column + 1;
+        //target.m_row = 27; //m_request->m_startCell.m_row + 1;
+        //target.m_column = 169; //m_request->m_startCell.m_column + 1;
 
+        target = reachableTargets[b * 117 % reachableTargets.size()];
 //        target.m_row = b * 17 % m_request->m_nmbRows;
 //        target.m_column = b * 5 % m_request->m_nmbColumns;
 
@@ -50,8 +64,14 @@ void Response::visualize() const
     {
         for (int c = 0; c != m_request->m_nmbColumns; ++c)
         {
-            if (m_reachableCoordinates(r, c))
-                writer.drawRectangle(r, c, r+1, c+1, 0);
+            for (int a = 0; a != m_request->m_nmbAltitudes; ++a)
+            {
+                if (m_isReachable[a](r, c))
+                {
+                    writer.drawRectangle(c, r, c+1, r+1, 0);
+                    break;
+                }
+            }
         }
     }
 
@@ -130,7 +150,7 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
     {
         const PQEntry currentQE = q.top();
 
-        m_reachableCoordinates(currentQE.m_nodeIndex.m_row, currentQE.m_nodeIndex.m_column) = 1;
+        m_isReachable[currentQE.m_nodeIndex.m_alt](currentQE.m_nodeIndex.m_row, currentQE.m_nodeIndex.m_column) = 1;
 
         if (currentQE.m_nodeIndex.m_row == a_to.m_row &&
             currentQE.m_nodeIndex.m_column == a_to.m_column)
@@ -144,7 +164,7 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
         q.pop();
         auto& currentNode = info[currentQE.m_nodeIndex.m_alt](currentQE.m_nodeIndex.m_row, currentQE.m_nodeIndex.m_column);
         ASSERT(currentNode.m_cost < 999999);
-        if (currentQE.m_cost > currentNode.m_cost)
+        if (currentQE.m_cost > currentNode.m_cost || (!currentNode.m_isValid && !q.empty()))
         {
             std::cout << "stop on settled" << std::endl;
             continue; // node already settled
@@ -153,7 +173,7 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
         {
             static int count = 0;
             ++count;
-
+/*
             //if (count < 100)
             {
                 std::cout << "cost: " << currentQE.m_cost << std::endl;
@@ -163,8 +183,8 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
                 std::cout << "valid: " << currentNode.m_isValid << std::endl;
                 std::cout << std::endl;
             }
-
-            ASSERT(count == 1 || currentNode.m_isValid);
+*/
+            //ASSERT(count == 1 || currentNode.m_isValid);
         }
 
         std::vector<int> neighbours;

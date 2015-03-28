@@ -27,7 +27,7 @@ private:
 
     std::vector<std::vector<size_t>> m_altitudeMoves;
 
-    Grid<int> m_reachableCoordinates;
+    std::vector<Grid<int>> m_isReachable;
 
 };
 
