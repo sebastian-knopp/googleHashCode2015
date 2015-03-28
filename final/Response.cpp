@@ -31,11 +31,7 @@ void Response::solve()
                 if (m_isReachable[a](r, c) == 1)
                 {
                     Coordinate coord { c, r, a};
-/*
-                    std::cout << "c row: " << coord.m_row << std::endl;
-                    std::cout << "c col: " << coord.m_column << std::endl;
-                    std::cout << "c alt: " << coord.m_alt << std::endl;
-*/
+
                     reachableTargets.push_back(coord);
                 }
             }
@@ -50,22 +46,12 @@ void Response::solve()
     for (int b = 0; b != nmbBallons; ++b)
     {
         Coordinate target;
-        //target.m_row = 27; //m_request->m_startCell.m_row + 1;
-        //target.m_column = 169; //m_request->m_startCell.m_column + 1;
 
         target = reachableTargets[(b * 3513 + 99) % reachableTargets.size()];
-/*
-        std::cout << "t row: " << target.m_row << std::endl;
-        std::cout << "t col: " << target.m_column << std::endl;
-        std::cout << "t alt: " << target.m_alt << std::endl;
-*/
-//        target.m_row = b * 17 % m_request->m_nmbRows;
-//        target.m_column = b * 5 % m_request->m_nmbColumns;
 
         std::vector<int> path = getShortestPath(m_request->m_startCell, target);
         for (size_t i = 0; i != path.size(); ++i)
         {
-            std::cout << "add " << path[i] << std::endl;
             m_altitudeMoves[i][b] = path[i];
         }
     }
@@ -118,15 +104,6 @@ std::ostream& operator<<(std::ostream& a_os, const Response& a_response)
 /**/
 std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
 {
-
-    std::cout << "a_from row: " << a_from.m_row << std::endl;
-    std::cout << "a_from col: " << a_from.m_column << std::endl;
-    std::cout << "a_from alt: " << a_from.m_alt << std::endl;
-
-    std::cout << "a_to row: " << a_to.m_row << std::endl;
-    std::cout << "a_to col: " << a_to.m_column << std::endl;
-    std::cout << "a_to alt: " << a_to.m_alt << std::endl;
-
     if (a_from.m_row == a_to.m_row &&
         a_from.m_column == a_to.m_column)
     {
@@ -151,7 +128,6 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
             return m_cost > e.m_cost;
         }
     };
-
 
     std::vector<Grid<NodeInfo>> info(m_request->m_nmbAltitudes,
                                      Grid<NodeInfo>(m_request->m_nmbRows, m_request->m_nmbColumns));
@@ -187,23 +163,6 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
             continue; // node already settled
         }
 
-        {
-            static int count = 0;
-            ++count;
-/*
-            //if (count < 100)
-            {
-                std::cout << "cost: " << currentQE.m_cost << std::endl;
-                std::cout << "row: " << currentQE.m_nodeIndex.m_row << std::endl;
-                std::cout << "col: " << currentQE.m_nodeIndex.m_column << std::endl;
-                std::cout << "alt: " << currentQE.m_nodeIndex.m_alt << std::endl;
-                std::cout << "valid: " << currentNode.m_isValid << std::endl;
-                std::cout << std::endl;
-            }
-*/
-            //ASSERT(count == 1 || currentNode.m_isValid);
-        }
-
         std::vector<int> neighbours;
         neighbours.reserve(3);
         neighbours.push_back(0);
@@ -236,11 +195,6 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
             {
                 neighborNode.m_predIndex = currentQE.m_nodeIndex;
                 neighborNode.m_cost = costWhenUsingThisNeighbor;
-/*
-                std::cout << "push row: " << neighborCoord.m_row << std::endl;
-                std::cout << "push col: " << neighborCoord.m_column << std::endl;
-                std::cout << "push alt: " << neighborCoord.m_alt << std::endl;
-*/
                 q.push( PQEntry { neighborNode.m_cost, neighborCoord });
             }
 
@@ -260,12 +214,7 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
     {
         currentQE = info[currentQE.m_alt](currentQE.m_row, currentQE.m_column).m_predIndex;
         int move = currentAlt - currentQE.m_alt;
-/*
-        std::cout << "m " << move << std::endl;
-        std::cout << "m row: " << currentQE.m_row << std::endl;
-        std::cout << "m col: " << currentQE.m_column << std::endl;
-        std::cout << "m alt: " << currentQE.m_alt << std::endl;
-*/
+
         result.push_back(move);
         currentAlt =currentQE.m_alt;
 
@@ -275,8 +224,6 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
     {
         result.empty(); // path not found
     }
-//    else
-//        result.pop_back();
 
     std::reverse(begin(result), end(result));
     return result;
