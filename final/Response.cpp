@@ -22,7 +22,6 @@ void Response::solve()
         Coordinate target;
         target.m_row = b * 17 % m_request->m_nmbRows;
         target.m_column = b * 5 % m_request->m_nmbColumns;
-        target.m_alt = 5;
 
         std::vector<int> path = getShortestPath(m_request->m_startCell, target);
         for (size_t i = 0; i != path.size(); ++i)
@@ -67,9 +66,10 @@ std::ostream& operator<<(std::ostream& a_os, const Response& a_response)
 /**/
 std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
 {
-    if (a_from.m_row == a_from.m_row &&
-        a_to.m_column == a_to.m_column)
+    if (a_from.m_row == a_to.m_row &&
+        a_from.m_column == a_to.m_column)
     {
+        std::cout << "already there" << std::endl;
         return std::vector<int>();
     }
 
@@ -106,7 +106,10 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
         const PQEntry currentQE = q.top();
         if (currentQE.m_nodeIndex.m_row == a_to.m_row &&
             currentQE.m_nodeIndex.m_column == a_to.m_column)
+        {
+            std::cout << "found target" << std::endl;
             break;
+        }
 
         q.pop();
         auto& currentNode = info[currentQE.m_nodeIndex.m_alt](currentQE.m_nodeIndex.m_row, currentQE.m_nodeIndex.m_column);
