@@ -80,9 +80,40 @@ void Response::solve()
         }
 
         std::vector<int> path = getShortestPath(m_request->m_startCell, target);
-        for (size_t i = 0; i != path.size(); ++i)
+
+        size_t turnIndex = 0;
+        for (turnIndex = 0; turnIndex != path.size(); ++turnIndex)
         {
-            m_altitudeMoves[i][b] = path[i];
+            m_altitudeMoves[turnIndex][b] = path[turnIndex];
+        }
+
+        Coordinate from1 = target;
+
+        int rowDiff = m_request->m_windVectors[target.m_alt](target.m_row, target.m_column).m_rowDiff;
+        int columnDiff = m_request->m_windVectors[target.m_alt](target.m_row, target.m_column).m_columnDiff;
+
+        from1.m_row += rowDiff;
+        from1.m_column += columnDiff;
+        if (from1.m_column < 0)
+            from1.m_column += m_request->m_nmbColumns;
+        from1.m_column = (from1.m_column % m_request->m_nmbColumns);
+
+        std::vector<int> cycle = getShortestPath(from1, target);
+        if (cycle.empty())
+            std::cout << "cycle not found" << std::endl;
+
+        std::vector<int> fullCycle;
+        fullCycle.push_back(0);
+        for (int m : cycle)
+        {
+            fullCycle.push_back(m);
+        }
+
+        int fullCycleIndex = 0;
+        for (; turnIndex != path.size(); ++turnIndex)
+        {
+            m_altitudeMoves[turnIndex][b] = fullCycle[fullCycleIndex];
+            ++fullCycleIndex;
         }
     }
 }
@@ -215,6 +246,7 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
 
             int rowDiff = m_request->m_windVectors[currentQE.m_nodeIndex.m_alt + s](currentQE.m_nodeIndex.m_row, currentQE.m_nodeIndex.m_column).m_rowDiff;
             int columnDiff = m_request->m_windVectors[currentQE.m_nodeIndex.m_alt + s](currentQE.m_nodeIndex.m_row, currentQE.m_nodeIndex.m_column).m_columnDiff;
+
             neighborCoord.m_row += rowDiff;
             neighborCoord.m_column += columnDiff;
             if (neighborCoord.m_column < 0)
