@@ -41,6 +41,8 @@ void Response::solve()
             }
         }
     }
+
+    /*
     for (int t = 1; t != m_request->m_nmbTurns; ++t){
         int currentalt=1;
         for (int b = 0; b != m_request->m_nmbBallons; ++b){
@@ -53,6 +55,7 @@ void Response::solve()
             }
         }
     }
+    */
 
     std::cout << "Found " << reachableTargets.size() << " reachable targets" << std::endl;
 
@@ -100,7 +103,7 @@ void Response::visualize()
     std::vector<Coordinate> targets = getBalloonTargets();
     for(size_t i=0;i<targets.size();++i){ //Draws a 3 pixel diameter circle for each target
         writer.drawCircle(targets[i].m_column,targets[i].m_row,1,3);
-        std::cout<<"("<<targets[i].m_row<<","<<targets[i].m_column<<")\n";
+        //std::cout<<"("<<targets[i].m_row<<","<<targets[i].m_column<<")\n";
     }
 }
 
@@ -172,7 +175,7 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
         {
             a_to.m_alt = currentQE.m_nodeIndex.m_alt;
             foundTarget = true;
-            std::cout << "found target" << std::endl;
+            //std::cout << "found target" << std::endl;
             break;
         }
 
