@@ -5,41 +5,43 @@
 
 struct Coordinate
 {
-    size_t m_x;
-    size_t m_y;
+    size_t m_column;
+    size_t m_row;
     size_t m_alt;
 };
 
 
 struct Vector
 {
-    size_t m_x;
-    size_t m_y;
+    size_t m_rowDiff;
+    size_t m_columnDiff;
 };
 
 
 template<typename T>
 struct Grid
 {
-    Grid(size_t a_width, size_t a_height)
-    : m_data(a_width * a_height)
-    , m_width(a_width)
+    Grid(size_t a_nmbRows, size_t a_nmbColumns)
+    : m_data(a_nmbRows * a_nmbColumns)
+    , m_nmbColumns(a_nmbColumns)
     {
     }
 
-    const T& operator() (size_t a_x, size_t a_y) const
+    const T& operator() (size_t a_row, size_t a_column) const
     {
-        return m_data[a_x + m_width * a_y];
+        return m_data[a_row + m_nmbColumns * a_column];
     }
 
-    T& operator() (size_t a_x, size_t a_y)
+    T& operator() (size_t a_row, size_t a_column)
     {
-        return m_data[a_x + m_width * a_y];
+        return m_data[a_row + m_nmbColumns * a_column];
     }
+
 
 private:
+
     std::vector<T> m_data;
-    size_t m_width;
+    size_t m_nmbColumns;
 };
 
 
