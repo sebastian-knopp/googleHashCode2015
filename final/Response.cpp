@@ -87,7 +87,7 @@ void Response::solve()
                     //std::cout << "use random target" << std::endl;
                 }
             }
-            std::vector<int> path = getShortestPath(start, target, false);
+            std::vector<int> path = getShortestPath(start, target, true);
             if (path.empty())
             {
                 break;
