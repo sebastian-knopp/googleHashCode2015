@@ -62,31 +62,49 @@ void Response::solve()
     const std::vector<Coordinate> targets = getBalloonTargets();
     ASSERT(targets.size() == static_cast<size_t>(m_request->m_nmbBallons));
 
+    int r = 0;
     int nmbBallons = m_request->m_nmbBallons;
     for (int b = 0; b != nmbBallons; ++b)
     {
-        Coordinate target;
-
-        target = reachableTargets[(b * 3513 + 99) % reachableTargets.size()];
-
-        for (int a = 0; a != m_request->m_nmbAltitudes; ++a)
+        int turnIndex = 0;
+        Coordinate start = m_request->m_startCell;
+        while (turnIndex < m_request->m_nmbTurns)
         {
-            if (m_isReachable[a](targets[b].m_row, targets[b].m_column) == 1)
+            ++r;
+            Coordinate target;
+            target = reachableTargets[(r * 3513 + 99) % reachableTargets.size()];
+            for (int a = 0; a != m_request->m_nmbAltitudes; ++a)
             {
-                target = targets[b];
-                target.m_alt = a;
+                if (m_isReachable[a](targets[b].m_row, targets[b].m_column) == 1)
+                {
+                    //std::cout << "use reachable target" << std::endl;
+                    target = targets[b];
+                    target.m_alt = a;
+                    break;
+                }
+                else
+                {
+                    //std::cout << "use random target" << std::endl;
+                }
+            }
+            std::vector<int> path = getShortestPath(start, target, false);
+            if (path.empty())
+            {
                 break;
             }
+
+            for (int p = 0; p < static_cast<int>(path.size()); ++p)
+            {
+                if (turnIndex+p >= m_request->m_nmbTurns)
+                    break;
+
+                m_altitudeMoves[turnIndex+p][b] = path[p];
+            }
+            turnIndex += path.size();
+            start = target;
         }
 
-        std::vector<int> path = getShortestPath(m_request->m_startCell, target, false);
-
-        int turnIndex = 0;
-        for (turnIndex = 0; turnIndex != static_cast<int>(path.size()); ++turnIndex)
-        {
-            m_altitudeMoves[turnIndex][b] = path[turnIndex];
-        }
-
+/*
         Coordinate from1 = target;
 
         int rowDiff = m_request->m_windVectors[target.m_alt](target.m_row, target.m_column).m_rowDiff;
@@ -99,8 +117,7 @@ void Response::solve()
         from1.m_column = (from1.m_column % m_request->m_nmbColumns);
 
         std::vector<int> cycle = getShortestPath(from1, target, true);
-        if (cycle.empty())
-            std::cout << "cycle not found" << std::endl;
+        std::cout << "cycle length: " << cycle.size() << std::endl;
 
         std::vector<int> fullCycle;
         fullCycle.push_back(0);
@@ -116,6 +133,7 @@ void Response::solve()
             ++fullCycleIndex;
             //std::cout << "m " << fullCycle[fullCycleIndex] << std::endl;
         }
+*/
     }
 }
 
