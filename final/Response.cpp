@@ -15,9 +15,16 @@ Response::Response(const Request& a_request)
 
 void Response::solve()
 {
+    const std::vector<Coordinate> targets = getBalloonTargets();
+
     for (int b = 0; b != m_request->m_nmbBallons; ++b)
     {
-        m_altitudeMoves[0][b] = 1;
+        Coordinate target = targets[b];
+        std::vector<int> path = getShortestPath(m_request->m_startCell, target);
+        for (size_t i = 0; i != path.size(); ++i)
+        {
+            m_altitudeMoves[i][b] = path[i];
+        }
     }
 }
 
