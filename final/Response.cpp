@@ -6,7 +6,7 @@
 
 Response::Response(const Request& a_request)
 : m_request(&a_request)
-, m_altitudeMoves(m_request->m_nmbTurns, std::vector<size_t>(m_request->m_nmbBallons, 0))
+, m_altitudeMoves(m_request->m_nmbTurns, std::vector<size_t>(m_request->m_nmbBallons, 1))
 {
 }
 
