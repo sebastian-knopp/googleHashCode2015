@@ -30,13 +30,19 @@ void Response::solve()
     {
         for (int r = 0; r != m_request->m_nmbRows; ++r)
         {
+            std::cout << "r " << r << std::endl;
             for (int c = 0; c != m_request->m_nmbColumns; ++c)
             {
                 if (m_isReachable[a](r, c) == 1)
                 {
                     Coordinate coord { c, r, a};
 
-                    reachableTargets.push_back(coord);
+                    std::vector<int> cycle = findSelfLoop(coord);
+                    if (!cycle.empty())
+                    {
+                        //std::cout << "found cycle" << std::endl;
+                        reachableTargets.push_back(coord);
+                    }
                 }
             }
         }
@@ -266,7 +272,7 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to, b
     std::vector<int> result;
     if (!foundTarget)
     {
-        std::cout << "could not find target" << std::endl;
+        //std::cout << "could not find target" << std::endl;
         return result;
     }
 
@@ -395,10 +401,13 @@ std::vector<int> Response::findSelfLoop(const Coordinate a_coord)
         from1.m_column += m_request->m_nmbColumns;
     from1.m_column = (from1.m_column % m_request->m_nmbColumns);
 
-    std::vector<int> cycle = getShortestPath(from1, a_coord, true, 3);
-    std::cout << "cycle length: " << cycle.size() << std::endl;
-
     std::vector<int> fullCycle;
+    if (from1.m_row < 0 || from1.m_row >= m_request->m_nmbRows)
+        return fullCycle;
+
+    std::vector<int> cycle = getShortestPath(from1, a_coord, true, 3);
+    //std::cout << "cycle length: " << cycle.size() << std::endl;
+
     fullCycle.push_back(0);
     for (int m : cycle)
     {
