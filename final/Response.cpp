@@ -12,8 +12,8 @@ Response::Response(const Request& a_request)
 
 void Response::solve()
 {
-    m_result = m_request->m_test * m_request->m_test;
-    ASSERT(m_result == 42 * 42);
+    //m_result = m_request->m_test * m_request->m_test;
+    //ASSERT(m_result == 42 * 42);
 }
 
 
