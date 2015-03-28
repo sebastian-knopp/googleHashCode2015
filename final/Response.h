@@ -15,6 +15,8 @@ public:
 
     void visualize() const;
 
+    std::vector<int> getShortestPath(Coordinate a_from, Coordinate a_to);
+
 
 private:
 
