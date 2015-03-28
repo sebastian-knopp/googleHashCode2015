@@ -17,11 +17,15 @@ void Response::solve()
 {
     const std::vector<Coordinate> targets = getBalloonTargets();
 
-    for (int b = 0; b != m_request->m_nmbBallons; ++b)
+    int nmbBallons = 1; // m_request->m_nmbBallons;
+    for (int b = 0; b != nmbBallons; ++b)
     {
         Coordinate target;
-        target.m_row = b * 17 % m_request->m_nmbRows;
-        target.m_column = b * 5 % m_request->m_nmbColumns;
+        target.m_row = m_request->m_startCell.m_row + 1;
+        target.m_column = m_request->m_startCell.m_column + 1;
+
+//        target.m_row = b * 17 % m_request->m_nmbRows;
+//        target.m_column = b * 5 % m_request->m_nmbColumns;
 
         std::vector<int> path = getShortestPath(m_request->m_startCell, target);
         for (size_t i = 0; i != path.size(); ++i)
@@ -66,6 +70,14 @@ std::ostream& operator<<(std::ostream& a_os, const Response& a_response)
 /**/
 std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
 {
+    std::cout << "a_from row: " << a_from.m_row << std::endl;
+    std::cout << "a_from col: " << a_from.m_column << std::endl;
+    std::cout << "a_from alt: " << a_from.m_alt << std::endl;
+
+    std::cout << "a_to row: " << a_to.m_row << std::endl;
+    std::cout << "a_to col: " << a_to.m_column << std::endl;
+    std::cout << "a_to alt: " << a_to.m_alt << std::endl;
+
     if (a_from.m_row == a_to.m_row &&
         a_from.m_column == a_to.m_column)
     {
@@ -109,6 +121,17 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
         {
             std::cout << "found target" << std::endl;
             break;
+        }
+
+        {
+            static int count = 0;
+            ++count;
+            if (count < 100)
+            {
+                std::cout << "row: " << currentQE.m_nodeIndex.m_row << std::endl;
+                std::cout << "col: " << currentQE.m_nodeIndex.m_column << std::endl;
+                std::cout << "alt: " << currentQE.m_nodeIndex.m_alt << std::endl;
+            }
         }
 
         q.pop();

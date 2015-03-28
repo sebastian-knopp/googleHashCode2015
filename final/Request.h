@@ -5,13 +5,14 @@
 
 struct Coordinate
 {
+    /*
     inline bool operator== (const Coordinate& a_other) const
     {
         return m_column == a_other.m_column &&
                m_row == a_other.m_row &&
                m_alt == a_other.m_alt;
     }
-
+*/
     int m_column;
     int m_row;
     int m_alt;
