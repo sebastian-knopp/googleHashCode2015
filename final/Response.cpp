@@ -18,6 +18,11 @@ void Response::solve()
 {
     const std::vector<Coordinate> targets = getBalloonTargets();
 
+    Coordinate unreachable;
+    unreachable.m_row = m_request->m_startCell.m_row + 1;
+    unreachable.m_column = m_request->m_startCell.m_column + 1;
+    getShortestPath(m_request->m_startCell, unreachable);
+
     int nmbBallons = 1; // m_request->m_nmbBallons;
     for (int b = 0; b != nmbBallons; ++b)
     {
@@ -41,11 +46,17 @@ void Response::visualize() const
 {
     SVGWriter writer("visualize.html", 800, 30);
 
-    writer.drawCircle(5, 12, 1, 20);
-    writer.drawCircle(300, 12, 2, 20);
+    for (int r = 0; r != m_request->m_nmbRows; ++r)
+    {
+        for (int c = 0; c != m_request->m_nmbColumns; ++c)
+        {
+            if (m_reachableCoordinates(r, c))
+                writer.drawRectangle(r, c, r+1, c+1, 0);
+        }
+    }
 
-    writer.drawText(20, 10, "Google Hash 2015 - Final", 20);
-    writer.drawText(20, 18, "Team: A211 - Mines Saint-Etienne - Gardanne - SFL", 14);
+    writer.drawRectangle(m_request->m_startCell.m_row, m_request->m_startCell.m_column,
+                         m_request->m_startCell.m_row + 1, m_request->m_startCell.m_column + 1, 4);
 
 }
 
@@ -144,7 +155,10 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
         q.pop();
         auto& currentNode = info[currentQE.m_nodeIndex.m_alt](currentQE.m_nodeIndex.m_row, currentQE.m_nodeIndex.m_column);
         if (currentNode.m_cost < currentQE.m_cost)
+        {
+            std::cout << "stop on settled" << std::endl;
             continue; // node already settled
+        }
 
         std::vector<int> neighbours;
         neighbours.reserve(3);
@@ -173,11 +187,11 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
             {
                 oppositeNode.m_predIndex = currentQE.m_nodeIndex;
                 oppositeNode.m_cost = costWhenUsingThisNeighbor;
-
+/*
                 std::cout << "push row: " << neighborCoord.m_row << std::endl;
                 std::cout << "push col: " << neighborCoord.m_column << std::endl;
                 std::cout << "push alt: " << neighborCoord.m_alt << std::endl;
-
+*/
                 q.push( PQEntry { oppositeNode.m_cost, neighborCoord });
             }
 
