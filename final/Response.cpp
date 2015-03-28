@@ -60,6 +60,7 @@ void Response::solve()
     std::cout << "Found " << reachableTargets.size() << " reachable targets" << std::endl;
 
     const std::vector<Coordinate> targets = getBalloonTargets();
+    ASSERT(targets.size() == static_cast<size_t>(m_request->m_nmbBallons));
 
     int nmbBallons = m_request->m_nmbBallons;
     for (int b = 0; b != nmbBallons; ++b)
@@ -67,6 +68,16 @@ void Response::solve()
         Coordinate target;
 
         target = reachableTargets[(b * 3513 + 99) % reachableTargets.size()];
+
+        for (int a = 0; a != m_request->m_nmbAltitudes; ++a)
+        {
+            if (m_isReachable[a](targets[b].m_row, targets[b].m_column) == 1)
+            {
+                target = targets[b];
+                target.m_alt = a;
+                break;
+            }
+        }
 
         std::vector<int> path = getShortestPath(m_request->m_startCell, target);
         for (size_t i = 0; i != path.size(); ++i)
