@@ -20,6 +20,8 @@ public:
     //! Returns a vector with size == nmb Balloons
     std::vector<Coordinate> getBalloonTargets();
 
+    std::vector<int> findSelfLoop(const Coordinate a_coord);
+
 
 private:
 
