@@ -42,8 +42,8 @@ void Response::calcSlice(const Slice a_slice)
         return;
     }
 
-    size_t width = a_slice.m_row2 - a_slice.m_row1 + 1;
-    size_t height = a_slice.m_column2 - a_slice.m_column1 + 1;
+    size_t thisSize = a_slice.m_row2 - a_slice.m_row1 + 1;
+    size_t otherSize = a_slice.m_column2 - a_slice.m_column1 + 1;
 
     Slice first = a_slice;
     Slice second = a_slice;
@@ -55,7 +55,7 @@ void Response::calcSlice(const Slice a_slice)
     size_t* beginOfSecond = &second.m_row1;
     size_t* beginTest = &test.m_row1;
     size_t* endTest = &test.m_row2;
-    if (height > width)
+    if (otherSize > thisSize)
     {
         beginOrig = &a_slice.m_column1;
         endOrig = &a_slice.m_column2;
@@ -76,7 +76,7 @@ void Response::calcSlice(const Slice a_slice)
         *beginTest = split;
         *endTest = split;
         sumHam += m_request->getNmbHam(test);
-        if (sumHam > nmbHamOrig / 2 && sumHam >= m_request->minNmbHam)
+        if ((sumHam > nmbHamOrig / 2) && sumHam >= m_request->minNmbHam)
             break;
     }
 
