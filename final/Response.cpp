@@ -119,10 +119,11 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
         if (currentQE.m_nodeIndex.m_row == a_to.m_row &&
             currentQE.m_nodeIndex.m_column == a_to.m_column)
         {
+            a_to.m_alt = currentQE.m_nodeIndex.m_alt;
             std::cout << "found target" << std::endl;
             break;
         }
-
+/*
         {
             static int count = 0;
             ++count;
@@ -133,7 +134,7 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
                 std::cout << "alt: " << currentQE.m_nodeIndex.m_alt << std::endl;
             }
         }
-
+*/
         q.pop();
         auto& currentNode = info[currentQE.m_nodeIndex.m_alt](currentQE.m_nodeIndex.m_row, currentQE.m_nodeIndex.m_column);
         if (currentNode.m_cost < currentQE.m_cost)
@@ -166,6 +167,11 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
             {
                 oppositeNode.m_predIndex = currentQE.m_nodeIndex;
                 oppositeNode.m_cost = costWhenUsingThisNeighbor;
+/*
+                std::cout << "push row: " << neighborCoord.m_row << std::endl;
+                std::cout << "push col: " << neighborCoord.m_column << std::endl;
+                std::cout << "push alt: " << neighborCoord.m_alt << std::endl;
+*/
                 q.push( PQEntry { oppositeNode.m_cost, neighborCoord });
             }
 
