@@ -23,7 +23,7 @@ void Response::solve()
     Coordinate unreachable;
     unreachable.m_row = m_request->m_startCell.m_row + 1;
     unreachable.m_column = m_request->m_startCell.m_column + 1;
-    getShortestPath(m_request->m_startCell, unreachable);
+    getShortestPath(m_request->m_startCell, unreachable, false);
 
     std::vector<Coordinate> reachableTargets;
     for (int a = 0; a != m_request->m_nmbAltitudes; ++a)
@@ -79,7 +79,7 @@ void Response::solve()
             }
         }
 
-        std::vector<int> path = getShortestPath(m_request->m_startCell, target);
+        std::vector<int> path = getShortestPath(m_request->m_startCell, target, false);
 
         int turnIndex = 0;
         for (turnIndex = 0; turnIndex != static_cast<int>(path.size()); ++turnIndex)
@@ -98,7 +98,7 @@ void Response::solve()
             from1.m_column += m_request->m_nmbColumns;
         from1.m_column = (from1.m_column % m_request->m_nmbColumns);
 
-        std::vector<int> cycle = getShortestPath(from1, target);
+        std::vector<int> cycle = getShortestPath(from1, target, true);
         if (cycle.empty())
             std::cout << "cycle not found" << std::endl;
 
@@ -170,7 +170,7 @@ std::ostream& operator<<(std::ostream& a_os, const Response& a_response)
 
 
 /**/
-std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
+std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to, bool a_checkAltitude)
 {
     if (a_from.m_row == a_to.m_row &&
         a_from.m_column == a_to.m_column)
@@ -213,8 +213,10 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
 
         m_isReachable[currentQE.m_nodeIndex.m_alt](currentQE.m_nodeIndex.m_row, currentQE.m_nodeIndex.m_column) = 1;
 
+        bool altOk = !a_checkAltitude || currentQE.m_nodeIndex.m_alt == a_to.m_alt;
         if (currentQE.m_nodeIndex.m_row == a_to.m_row &&
-            currentQE.m_nodeIndex.m_column == a_to.m_column)
+            currentQE.m_nodeIndex.m_column == a_to.m_column &&
+            altOk)
         {
             a_to.m_alt = currentQE.m_nodeIndex.m_alt;
             foundTarget = true;
@@ -258,6 +260,7 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
                 continue;
 
             neighborCoord.m_alt += s;
+            ASSERT(neighborCoord.m_alt >= 0 && neighborCoord.m_alt < m_request->m_nmbAltitudes);
 
             NodeInfo& neighborNode = info[neighborCoord.m_alt](neighborCoord.m_row, neighborCoord.m_column);
             if (costWhenUsingThisNeighbor < neighborNode.m_cost)
