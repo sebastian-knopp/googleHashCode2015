@@ -9,6 +9,7 @@
 Response::Response(const Request& a_request)
 : m_request(&a_request)
 , m_altitudeMoves(m_request->m_nmbTurns, std::vector<size_t>(m_request->m_nmbBallons, 0))
+, m_reachableCoordinates(m_request->m_nmbRows, m_request->m_nmbColumns)
 {
 }
 
@@ -21,8 +22,8 @@ void Response::solve()
     for (int b = 0; b != nmbBallons; ++b)
     {
         Coordinate target;
-        target.m_row = m_request->m_startCell.m_row + 1;
-        target.m_column = m_request->m_startCell.m_column + 1;
+        target.m_row = 27; //m_request->m_startCell.m_row + 1;
+        target.m_column = 169; //m_request->m_startCell.m_column + 1;
 
 //        target.m_row = b * 17 % m_request->m_nmbRows;
 //        target.m_column = b * 5 % m_request->m_nmbColumns;
@@ -117,6 +118,9 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
     while (!q.empty())
     {
         const PQEntry currentQE = q.top();
+
+        m_reachableCoordinates(currentQE.m_nodeIndex.m_row, currentQE.m_nodeIndex.m_column) = 1;
+
         if (currentQE.m_nodeIndex.m_row == a_to.m_row &&
             currentQE.m_nodeIndex.m_column == a_to.m_column)
         {
@@ -169,11 +173,11 @@ std::vector<int> Response::getShortestPath(Coordinate a_from, Coordinate a_to)
             {
                 oppositeNode.m_predIndex = currentQE.m_nodeIndex;
                 oppositeNode.m_cost = costWhenUsingThisNeighbor;
-/*
+
                 std::cout << "push row: " << neighborCoord.m_row << std::endl;
                 std::cout << "push col: " << neighborCoord.m_column << std::endl;
                 std::cout << "push alt: " << neighborCoord.m_alt << std::endl;
-*/
+
                 q.push( PQEntry { oppositeNode.m_cost, neighborCoord });
             }
 
